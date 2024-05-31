@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class Controller {
 
-    private final Simulacion simulacionService;
+    private final Simulacion simulacion;
 
     @GetMapping("/simular")
     public ResponseEntity<?> simular(@RequestBody ParametrosDto parametros) {
         try {
-            return ResponseEntity.ok(simulacionService.realizarSimulacion(parametros));
+            return ResponseEntity.ok(simulacion.realizarSimulacion(parametros));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity

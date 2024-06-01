@@ -4,6 +4,8 @@ package api.sim.colas.dtos;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import lombok.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -47,6 +49,7 @@ public class VectorEstado {
 
     private float promedioRecaudacionDiaria;
 
-    private List<Cliente> listaClientes;
+    @Builder.Default
+    private List<Cliente> listaClientes = new ArrayList<>();
 
 }

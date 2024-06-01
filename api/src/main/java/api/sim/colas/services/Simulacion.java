@@ -1,9 +1,11 @@
 package api.sim.colas.services;
 
+import api.sim.colas.dtos.IdPeluqueroDto;
 import api.sim.colas.dtos.ParametrosDto;
 import api.sim.colas.dtos.PeluqueroDto;
 import api.sim.colas.dtos.VectorEstado;
 import api.sim.colas.enums.Evento;
+import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,8 @@ public class Simulacion {
     private VectorEstado vectorEstado;
 
     private VectorEstado vectorEstadoProximo;
+
+    private int nextIdCliente = 1;
 
     public List<VectorEstado> realizarSimulacion(ParametrosDto dto) {
 
@@ -161,22 +165,32 @@ public class Simulacion {
              - estado (del peluquero)
       */
     private void receptarCliente() {
+        Cliente cliente = Cliente.builder()
+                .id(nextIdCliente)
+                .build();
+
         calcularProximaLlegada();
 
         Peluquero peluquero = determinarQuienLoAtiende();
+        cliente.setPeluquero(IdPeluqueroDto.fromPeluquero(peluquero));
+
         Float finAtencion = vectorEstado.getPeluqueros().get(peluquero.getId()).getFinAtencion();
 
         if (peluquero.estaOcupado()) {
             peluquero.sumarClienteACola();
+            cliente.esperar();
         } else {
             finAtencion = determinarTiempoAtencion(peluquero);
             peluquero.atender();
+            cliente.serAtendido();
+            cliente.setAcumuladorTiempoEspera(0);
         }
 
         actualizarPeluqueros(peluquero, finAtencion);
 
         float ganancia = 0;
         actualizarVariablesEstadisticas(ganancia);
+        agregarCliente(cliente);
     }
 
     /*
@@ -288,5 +302,9 @@ public class Simulacion {
 
     private void actualizarVariablesEstadisticas(float ganancia) {
         vectorEstadoProximo.setAcumuladorGanancias(vectorEstado.getAcumuladorGanancias() + ganancia);
+    }
+
+    private void agregarCliente(Cliente cliente) {
+        vectorEstadoProximo.getListaClientes().add(cliente);
     }
 }

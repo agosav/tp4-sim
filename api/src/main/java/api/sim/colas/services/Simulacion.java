@@ -74,7 +74,7 @@ public class Simulacion {
         // Este método determina el valor del reloj de la fila actual. También determina el evento (llegada cliente o fin simulación)
         determinarReloj();
 
-        // Acá se realizan todos los cálculos de la tabla
+        // Acá llamamos un método distinto según el evento que corresponda a la fila actual
         if (vectorEstadoProximo.getEvento() == Evento.LLEGADA_CLIENTE) {
             receptarCliente();
         } else {
@@ -126,6 +126,7 @@ public class Simulacion {
 
         // Copiamos el fin de atención de la fila anterior
         Float finAtencion = vectorEstado.getPeluqueros().get(peluquero.getId()).getFinAtencion();
+        actualizarPeluqueros(peluquero, finAtencion);
 
         // Si el peluquero está ocupado, sumamos 1 a su cola y ponemos al cliente en estado Esperando Atención
         if (peluquero.estaOcupado()) {

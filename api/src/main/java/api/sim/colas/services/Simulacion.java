@@ -5,8 +5,6 @@ import api.sim.colas.dtos.PeluqueroDto;
 import api.sim.colas.dtos.VectorEstado;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Peluquero;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,8 +13,6 @@ import java.util.Objects;
 
 @Service
 public class Simulacion {
-
-    private static final Logger logger = LoggerFactory.getLogger(Simulacion.class);
 
     private float tiempoLlegadaMin;
 
@@ -178,6 +174,9 @@ public class Simulacion {
         }
 
         actualizarPeluqueros(peluquero, finAtencion);
+
+        float ganancia = 0;
+        actualizarVariablesEstadisticas(ganancia);
     }
 
     /*
@@ -209,8 +208,11 @@ public class Simulacion {
         }
 
         peluquero.terminarAtencion();
+        float ganancia = peluquero.getTarifa();
 
         actualizarPeluqueros(peluquero, finAtencion);
+
+        actualizarVariablesEstadisticas(ganancia);
     }
 
     private void calcularProximaLlegada() {
@@ -282,5 +284,9 @@ public class Simulacion {
         List<PeluqueroDto> peluquerosDuplicados = new ArrayList<>(vectorEstado.getPeluqueros());
         peluquerosDuplicados.set(peluquero.getId(), peluqueroDto);
         vectorEstadoProximo.setPeluqueros(peluquerosDuplicados);
+    }
+
+    private void actualizarVariablesEstadisticas(float ganancia) {
+        vectorEstadoProximo.setAcumuladorGanancias(vectorEstado.getAcumuladorGanancias() + ganancia);
     }
 }

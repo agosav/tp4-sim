@@ -1,6 +1,6 @@
 package api.sim.colas.objetos;
 
-import api.sim.colas.estados.EstadoCliente;
+import api.sim.colas.enums.EstadoCliente;
 import lombok.Builder;
 import lombok.Data;
 

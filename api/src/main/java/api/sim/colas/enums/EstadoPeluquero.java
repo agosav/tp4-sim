@@ -1,4 +1,4 @@
-package api.sim.colas.estados;
+package api.sim.colas.enums;
 
 public enum EstadoPeluquero {
 

@@ -1,7 +1,7 @@
 package api.sim.colas.dtos;
 
 
-import api.sim.colas.estados.EstadoPeluquero;
+import api.sim.colas.enums.EstadoPeluquero;
 import api.sim.colas.objetos.Peluquero;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +15,8 @@ public class PeluqueroDto {
     private EstadoPeluquero estado;
 
     private int cola;
+
+    private Float finAtencion;
 
     public static PeluqueroDto fromPeluquero(Peluquero peluquero) {
         return PeluqueroDto.builder()

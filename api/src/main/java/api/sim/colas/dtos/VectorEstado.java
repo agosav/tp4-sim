@@ -1,19 +1,21 @@
 package api.sim.colas.dtos;
 
 
+import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
-import lombok.Builder;
-import lombok.Getter;
-
+import lombok.*;
 import java.util.List;
 
 
 @Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class VectorEstado {
 
     @Builder.Default
-    private String evento = "Inicialización";
+    private Evento evento = Evento.INICIALIZACION;
 
     private float relojTotal;
 
@@ -33,23 +35,13 @@ public class VectorEstado {
 
     private Float tiempoAtencion;
 
-    private float finAtencion1;
-
-    private float finAtencion2;
-
-    private float finAtencion3;
-
-    private PeluqueroDto aprendiz;
-
-    private PeluqueroDto veteranoA;
-
-    private PeluqueroDto veteranoB;
+    private List<PeluqueroDto> peluqueros;
 
     private float acumuladorCostos;
 
     private float acumuladorGanancias;
 
-    private int horaDelDía;
+    private int horaDelDia;
 
     private int contadorDias;
 

@@ -169,6 +169,8 @@ public class Simulacion {
                 .id(nextIdCliente)
                 .build();
 
+        nextIdCliente++;
+
         calcularProximaLlegada();
 
         Peluquero peluquero = determinarQuienLoAtiende();
@@ -187,10 +189,7 @@ public class Simulacion {
         }
 
         actualizarPeluqueros(peluquero, finAtencion);
-
-        float ganancia = 0;
-        actualizarVariablesEstadisticas(ganancia);
-        agregarCliente(cliente);
+        actualizarVariablesEstadisticas(peluquero, cliente);
     }
 
     /*
@@ -214,6 +213,10 @@ public class Simulacion {
         duplicarProximaLlegada();
 
         Peluquero peluquero = determinarQuienFinalizoAtencion();
+        Cliente cliente = vectorEstado.getListaClientes().stream()
+                .filter(c -> c.getPeluquero().equals(peluquero))
+                .findFirst()
+                .orElse(null);
 
         if (peluquero.tieneCola()) {
             finAtencion = determinarTiempoAtencion(peluquero);
@@ -222,11 +225,8 @@ public class Simulacion {
         }
 
         peluquero.terminarAtencion();
-        float ganancia = peluquero.getTarifa();
-
         actualizarPeluqueros(peluquero, finAtencion);
-
-        actualizarVariablesEstadisticas(ganancia);
+        actualizarVariablesEstadisticas(peluquero, cliente);
     }
 
     private void calcularProximaLlegada() {
@@ -300,11 +300,19 @@ public class Simulacion {
         vectorEstadoProximo.setPeluqueros(peluquerosDuplicados);
     }
 
-    private void actualizarVariablesEstadisticas(float ganancia) {
-        vectorEstadoProximo.setAcumuladorGanancias(vectorEstado.getAcumuladorGanancias() + ganancia);
-    }
+    private void actualizarVariablesEstadisticas(Peluquero peluquero, Cliente cliente) {
+        Evento evento = vectorEstadoProximo.getEvento();
+        float acumuladorGanancias = vectorEstado.getAcumuladorGanancias();
 
-    private void agregarCliente(Cliente cliente) {
-        vectorEstadoProximo.getListaClientes().add(cliente);
+        vectorEstadoProximo.getListaClientes().addAll(vectorEstado.getListaClientes());
+
+        if (evento == Evento.LLEGADA_CLIENTE) {
+            vectorEstadoProximo.getListaClientes().add(cliente);
+            vectorEstadoProximo.setAcumuladorGanancias(acumuladorGanancias);
+        }
+        if (evento == Evento.FIN_ATENCION) {
+            vectorEstadoProximo.getListaClientes().remove(cliente);
+            vectorEstadoProximo.setAcumuladorGanancias(acumuladorGanancias + peluquero.getTarifa());
+        }
     }
 }

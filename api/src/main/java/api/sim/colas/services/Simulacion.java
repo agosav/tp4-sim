@@ -4,6 +4,7 @@ import api.sim.colas.dtos.IdPeluqueroDto;
 import api.sim.colas.dtos.ParametrosDto;
 import api.sim.colas.dtos.PeluqueroDto;
 import api.sim.colas.dtos.VectorEstado;
+import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
@@ -30,6 +31,11 @@ public class Simulacion {
 
     private int nextIdCliente = 1;
 
+    // ------------------------------------------------------------------------------------
+    // ------------ Funciones para la generación y corrida de la simulación ---------------
+    // ------------------------------------------------------------------------------------
+
+    // Este método inicializa la simulación y la corre
     public List<VectorEstado> realizarSimulacion(ParametrosDto dto) {
 
         this.tiempoLlegadaMin = dto.getTiempoLlegadaMin();
@@ -51,52 +57,7 @@ public class Simulacion {
         return simularNFilas(dto.getN(), dto.getI(), dto.getJ());
     }
 
-    private List<Peluquero> inicializarPeluqueros(ParametrosDto dto) {
-        Peluquero aprendiz = Peluquero.builder()
-                .id(0)
-                .nombre("Aprendiz")
-                .tarifa(1800)
-                .tiempoAtencionMin(dto.getTiempoAtencionMinAprendiz())
-                .tiempoAtencionMax(dto.getTiempoAtencionMaxAprendiz())
-                .build();
-
-        Peluquero veteranoA = Peluquero.builder()
-                .id(1)
-                .nombre("Veterano A")
-                .tarifa(3500)
-                .tiempoAtencionMin(dto.getTiempoAtencionMinVeteranoA())
-                .tiempoAtencionMax(dto.getTiempoAtencionMaxVeteranoA())
-                .build();
-
-        Peluquero veteranoB = Peluquero.builder()
-                .id(2)
-                .nombre("Veterano B")
-                .tarifa(3500)
-                .tiempoAtencionMin(dto.getTiempoAtencionMinVeteranoB())
-                .tiempoAtencionMax(dto.getTiempoAtencionMaxVeteranoB())
-                .build();
-
-        return List.of(aprendiz, veteranoA, veteranoB);
-    }
-
-    private float[] calcularProbabilidadesAcumuladas(ParametrosDto dto) {
-        float aprendiz = dto.getPorcentajeAprendiz() / 100;
-        float veteranoA = dto.getPorcentajeVeteranoA() / 100;
-        float veteranoB = dto.getPorcentajeVeteranoB() / 100;
-
-        float[] acumuladas = {
-                aprendiz,
-                aprendiz + veteranoA,
-                aprendiz + veteranoA + veteranoB
-        };
-
-        if (acumuladas[2] != 1) {
-            throw new IllegalArgumentException("La suma de las probabilidades de los peluqueros no da 100%");
-        }
-
-        return acumuladas;
-    }
-
+    // Este método tiene el for que hace las N filas de la simulación. Devuelve la tabla que se va a mostrar
     private List<VectorEstado> simularNFilas(int n, int i, int j) {
         List<VectorEstado> tabla = new ArrayList<>();
 
@@ -108,42 +69,26 @@ public class Simulacion {
         return tabla;
     }
 
+    // Este método se encarga de simular 1 fila.
     private void simularUnaFila() {
+        // Este método determina el valor del reloj de la fila actual. También determina el evento (llegada cliente o fin simulación)
         determinarReloj();
 
+        // Acá se realizan todos los cálculos de la tabla
         if (vectorEstadoProximo.getEvento() == Evento.LLEGADA_CLIENTE) {
             receptarCliente();
         } else {
             finalizarAtencion();
         }
 
+        // Reemplazar la fila vieja por la nueva
         this.vectorEstado = vectorEstadoProximo;
         this.vectorEstadoProximo = new VectorEstado();
     }
 
-    private void duplicarProximaLlegada() {
-        vectorEstadoProximo.setProximaLlegada(vectorEstado.getProximaLlegada());
-    }
-
-    private void determinarReloj() {
-        float proximoReloj;
-        float proximaLlegada = vectorEstado.getProximaLlegada();
-        float finAtencionMin = vectorEstado.getPeluqueros().stream()
-                .map(PeluqueroDto::getFinAtencion)
-                .filter(Objects::nonNull)
-                .min(Float::compare)
-                .orElse(Float.MAX_VALUE);
-
-        if (proximaLlegada < finAtencionMin) {
-            proximoReloj = proximaLlegada;
-            vectorEstadoProximo.setEvento(Evento.LLEGADA_CLIENTE);
-        } else {
-            proximoReloj = finAtencionMin;
-            vectorEstadoProximo.setEvento(Evento.FIN_ATENCION);
-        }
-
-        vectorEstadoProximo.setRelojTotal(proximoReloj);
-    }
+    // ------------------------------------------------------------------------------------
+    // ---------------------- Funciones encargadas de cada evento -------------------------
+    // ------------------------------------------------------------------------------------
 
     /*
      Mantiene:
@@ -165,22 +110,29 @@ public class Simulacion {
              - estado (del peluquero)
       */
     private void receptarCliente() {
+        // Creamos objeto cliente
         Cliente cliente = Cliente.builder()
                 .id(nextIdCliente)
                 .build();
 
         nextIdCliente++;
 
+        // Calculamos el valor de la próxima llegada de un cliente
         calcularProximaLlegada();
 
+        // Determinamos quién va a atender a este cliente
         Peluquero peluquero = determinarQuienLoAtiende();
         cliente.setPeluquero(IdPeluqueroDto.fromPeluquero(peluquero));
 
+        // Copiamos el fin de atención de la fila anterior
         Float finAtencion = vectorEstado.getPeluqueros().get(peluquero.getId()).getFinAtencion();
 
+        // Si el peluquero está ocupado, sumamos 1 a su cola y ponemos al cliente en estado Esperando Atención
         if (peluquero.estaOcupado()) {
             peluquero.sumarClienteACola();
             cliente.esperar();
+
+        //Si el peluquero está libre, ponemos al peluquero en estado Ocupado y al cliente en estado Siendo atendido
         } else {
             finAtencion = determinarTiempoAtencion(peluquero);
             peluquero.atender();
@@ -188,8 +140,11 @@ public class Simulacion {
             cliente.setAcumuladorTiempoEspera(0);
         }
 
+        // Actualizamos el vector estado
         actualizarPeluqueros(peluquero, finAtencion);
-        actualizarVariablesEstadisticas(peluquero, cliente);
+        vectorEstadoProximo.getListaClientes().addAll(vectorEstado.getListaClientes());
+        vectorEstadoProximo.getListaClientes().add(cliente);
+        vectorEstadoProximo.setAcumuladorGanancias(vectorEstado.getAcumuladorGanancias());
     }
 
     /*
@@ -210,24 +165,39 @@ public class Simulacion {
     private void finalizarAtencion() {
         Float finAtencion;
 
+        // Duplicamos el valor de la fila anterior de la próxima llegada
         duplicarProximaLlegada();
 
+        // Buscamos al peluquero y al cliente involucrados en el Fin de atención
         Peluquero peluquero = determinarQuienFinalizoAtencion();
-        Cliente cliente = vectorEstado.getListaClientes().stream()
-                .filter(c -> c.getPeluquero().equals(peluquero))
-                .findFirst()
-                .orElse(null);
+        Cliente cliente = determinarClienteRecienAtendido(peluquero);
 
+        // Si el peluquero tiene cola, ponemos en estado Siendo Atendido al próximo cliente
+        vectorEstadoProximo.getListaClientes().addAll(vectorEstado.getListaClientes());
         if (peluquero.tieneCola()) {
             finAtencion = determinarTiempoAtencion(peluquero);
+            Cliente siguienteCliente = determinarProximoClienteEnCola(peluquero);
+            vectorEstadoProximo.getListaClientes().remove(siguienteCliente);
+            siguienteCliente.serAtendido();
+            vectorEstadoProximo.getListaClientes().add(siguienteCliente);
+
+        // Si el peluquero no tiene cola, eliminamos su finAtencion
         } else {
             finAtencion = null;
         }
 
+        // Actualizamos los atributos del peluquero
         peluquero.terminarAtencion();
+
+        // Actualziamos vector estado
         actualizarPeluqueros(peluquero, finAtencion);
-        actualizarVariablesEstadisticas(peluquero, cliente);
+        vectorEstadoProximo.getListaClientes().remove(cliente);
+        vectorEstadoProximo.setAcumuladorGanancias(vectorEstado.getAcumuladorGanancias() + peluquero.getTarifa());
     }
+
+    // ------------------------------------------------------------------------------------
+    // ----------------- Funciones para determinar variables aleatorias -------------------
+    // ------------------------------------------------------------------------------------
 
     private void calcularProximaLlegada() {
         float reloj = vectorEstadoProximo.getRelojTotal();
@@ -274,6 +244,35 @@ public class Simulacion {
         return finAtencion;
     }
 
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------- Funciones auxiliares -------------------------------
+    // ------------------------------------------------------------------------------------
+
+    private void duplicarProximaLlegada() {
+        vectorEstadoProximo.setProximaLlegada(vectorEstado.getProximaLlegada());
+    }
+
+    private void determinarReloj() {
+        float proximoReloj;
+        float proximaLlegada = vectorEstado.getProximaLlegada();
+        float finAtencionMin = vectorEstado.getPeluqueros().stream()
+                .map(PeluqueroDto::getFinAtencion)
+                .filter(Objects::nonNull)
+                .min(Float::compare)
+                .orElse(Float.MAX_VALUE);
+
+        if (proximaLlegada < finAtencionMin) {
+            proximoReloj = proximaLlegada;
+            vectorEstadoProximo.setEvento(Evento.LLEGADA_CLIENTE);
+        } else {
+            proximoReloj = finAtencionMin;
+            vectorEstadoProximo.setEvento(Evento.FIN_ATENCION);
+        }
+
+        vectorEstadoProximo.setRelojTotal(proximoReloj);
+    }
+
     private Peluquero determinarQuienFinalizoAtencion() {
         float reloj = vectorEstadoProximo.getRelojTotal();
 
@@ -285,6 +284,20 @@ public class Simulacion {
         }
 
         return null;
+    }
+
+    private Cliente determinarClienteRecienAtendido(Peluquero peluquero) {
+        return vectorEstado.getListaClientes().stream()
+                .filter(c -> c.getPeluquero().getId() == peluquero.getId() && c.getEstado() == EstadoCliente.SIENDO_ATENDIDO)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Cliente determinarProximoClienteEnCola(Peluquero peluquero) {
+        return vectorEstado.getListaClientes().stream()
+                .filter(c -> c.getPeluquero().getId() == peluquero.getId() && c.getEstado() == EstadoCliente.ESPERANDO_ATENCION)
+                .findFirst()
+                .orElse(null);
     }
 
     private void actualizarPeluqueros(Peluquero peluquero, Float finAtencion) {
@@ -300,19 +313,52 @@ public class Simulacion {
         vectorEstadoProximo.setPeluqueros(peluquerosDuplicados);
     }
 
-    private void actualizarVariablesEstadisticas(Peluquero peluquero, Cliente cliente) {
-        Evento evento = vectorEstadoProximo.getEvento();
-        float acumuladorGanancias = vectorEstado.getAcumuladorGanancias();
+    // Este método inicializa los objetos servidores (los tres peluqueros)
+    private List<Peluquero> inicializarPeluqueros(ParametrosDto dto) {
+        Peluquero aprendiz = Peluquero.builder()
+                .id(0)
+                .nombre("Aprendiz")
+                .tarifa(1800)
+                .tiempoAtencionMin(dto.getTiempoAtencionMinAprendiz())
+                .tiempoAtencionMax(dto.getTiempoAtencionMaxAprendiz())
+                .build();
 
-        vectorEstadoProximo.getListaClientes().addAll(vectorEstado.getListaClientes());
+        Peluquero veteranoA = Peluquero.builder()
+                .id(1)
+                .nombre("Veterano A")
+                .tarifa(3500)
+                .tiempoAtencionMin(dto.getTiempoAtencionMinVeteranoA())
+                .tiempoAtencionMax(dto.getTiempoAtencionMaxVeteranoA())
+                .build();
 
-        if (evento == Evento.LLEGADA_CLIENTE) {
-            vectorEstadoProximo.getListaClientes().add(cliente);
-            vectorEstadoProximo.setAcumuladorGanancias(acumuladorGanancias);
+        Peluquero veteranoB = Peluquero.builder()
+                .id(2)
+                .nombre("Veterano B")
+                .tarifa(3500)
+                .tiempoAtencionMin(dto.getTiempoAtencionMinVeteranoB())
+                .tiempoAtencionMax(dto.getTiempoAtencionMaxVeteranoB())
+                .build();
+
+        return List.of(aprendiz, veteranoA, veteranoB);
+    }
+
+    // Este método es para acumular las probabilidades en una lista para usar después.
+    // [15, 45, 40] -> [0.15, 0.6, 1]
+    private float[] calcularProbabilidadesAcumuladas(ParametrosDto dto) {
+        float aprendiz = dto.getPorcentajeAprendiz() / 100;
+        float veteranoA = dto.getPorcentajeVeteranoA() / 100;
+        float veteranoB = dto.getPorcentajeVeteranoB() / 100;
+
+        float[] acumuladas = {
+                aprendiz,
+                aprendiz + veteranoA,
+                aprendiz + veteranoA + veteranoB
+        };
+
+        if (acumuladas[2] != 1) {
+            throw new IllegalArgumentException("La suma de las probabilidades de los peluqueros no da 100%");
         }
-        if (evento == Evento.FIN_ATENCION) {
-            vectorEstadoProximo.getListaClientes().remove(cliente);
-            vectorEstadoProximo.setAcumuladorGanancias(acumuladorGanancias + peluquero.getTarifa());
-        }
+
+        return acumuladas;
     }
 }

@@ -5,6 +5,7 @@ import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
+import api.sim.colas.utils.Auxiliar;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class VectorEstado {
         return proximaLlegada;
     }
 
-    public Peluquero determinarQuienLoAtiende(float[] probabilidades, List<Peluquero> peluqueros) {
+    public Peluquero determinarQuienLoAtiende(float[] probabilidades) {
         float random = (float) Math.random();
         Peluquero peluquero = null;
 
@@ -119,8 +120,14 @@ public class VectorEstado {
     }
 
     public void duplicarVector(VectorEstado vectorAnterior, Evento evento) {
-        this.peluqueros.addAll(vectorAnterior.getPeluqueros());
-        this.listaClientes.addAll(vectorAnterior.getListaClientes());
+        this.peluqueros = new ArrayList<>();
+        for (Peluquero peluquero : vectorAnterior.getPeluqueros()) {
+            this.peluqueros.add(Auxiliar.construirPeluquero(peluquero, peluquero.getFinAtencion()));
+        }
+        this.listaClientes = new ArrayList<>();
+        for (Cliente cliente : vectorAnterior.getListaClientes()) {
+            this.listaClientes.add(Auxiliar.construirCliente(cliente));
+        }
 
         if (evento == Evento.FIN_ATENCION) {
             this.proximaLlegada = vectorAnterior.getProximaLlegada();
@@ -132,18 +139,18 @@ public class VectorEstado {
     }
 
     public void agregarCliente(Cliente cliente) {
-        this.listaClientes.add(cliente);
+        this.listaClientes.add(Auxiliar.construirCliente(cliente));
     }
 
     public void quitarCliente(Cliente cliente) {
         this.listaClientes.remove(cliente);
     }
 
-    public Peluquero determinarQuePeluqueroFinalizoAtencion(VectorEstado vectorAnterior) {
+    public Peluquero determinarQuePeluqueroFinalizoAtencion() {
         Peluquero peluquero = null;
 
-        for (int i = 0; i < peluqueros.size(); i++) {
-            peluquero = vectorAnterior.getPeluqueros().get(i);
+        for (Peluquero value : peluqueros) {
+            peluquero = value;
             Float finAtencion = peluquero.getFinAtencion();
             if (finAtencion != null && finAtencion == reloj) {
                 break;
@@ -170,12 +177,27 @@ public class VectorEstado {
     }
 
     public void actualizarPeluquero(Peluquero peluquero, Float finAtencion) {
-        this.peluqueros.get(peluquero.getId()).setFinAtencion(finAtencion);
-        this.peluqueros.get(peluquero.getId()).setCola(peluquero.getCola());
-        this.peluqueros.get(peluquero.getId()).setEstado(peluquero.getEstado());
+        Peluquero peluqueroActualizado = Auxiliar.construirPeluquero(peluquero, finAtencion);
+        this.peluqueros.set(peluquero.getId(), peluqueroActualizado);
     }
 
-    public float obtenerFinAtencionfromPeluquero(Peluquero peluquero) {
+    public Float obtenerFinAtencionfromPeluquero(Peluquero peluquero) {
         return peluqueros.get(peluquero.getId()).getFinAtencion();
     }
+
+    public void actualizarCliente(Cliente cliente) {
+        Cliente clienteActualizado = Auxiliar.construirCliente(cliente);
+        List<Cliente> listaActualizada = new ArrayList<>();
+
+        for (Cliente c : listaClientes) {
+            if (c.getId() == cliente.getId()) {
+                listaActualizada.add(clienteActualizado);
+            } else {
+                listaActualizada.add(c);
+            }
+        }
+
+        this.listaClientes = listaActualizada;
+    }
+
 }

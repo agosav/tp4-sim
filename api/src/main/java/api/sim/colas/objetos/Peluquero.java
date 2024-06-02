@@ -3,6 +3,8 @@ package api.sim.colas.objetos;
 import api.sim.colas.enums.EstadoPeluquero;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 @Builder
@@ -41,7 +43,6 @@ public class Peluquero {
 
     public void atender() {
         this.estado = EstadoPeluquero.OCUPADO;
-        this.cola = Math.max(0, cola - 1);
     }
 
     public void terminarAtencion() {

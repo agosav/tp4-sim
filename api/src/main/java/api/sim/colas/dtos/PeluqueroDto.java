@@ -23,6 +23,7 @@ public class PeluqueroDto {
                 .nombre(peluquero.getNombre())
                 .estado(peluquero.getEstado())
                 .cola(peluquero.getCola())
+                .finAtencion(peluquero.getFinAtencion())
                 .build();
     }
 }

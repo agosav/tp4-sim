@@ -20,6 +20,8 @@ public class Peluquero {
 
     private int tarifa;
 
+    private Float finAtencion;
+
     // Parámetros para la distribución uniforme para el tiempo de atención
     private float tiempoAtencionMin;  // a
 

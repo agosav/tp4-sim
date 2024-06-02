@@ -8,6 +8,7 @@ import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
+import ch.qos.logback.core.net.server.Client;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -71,11 +72,11 @@ public class Simulacion {
 
     // Este método se encarga de simular 1 fila.
     private void simularUnaFila() {
-        // Este método determina el valor del reloj de la fila actual. También determina el evento (llegada cliente o fin simulación)
-        determinarReloj();
+        // Este método determina el evento (llegada cliente o fin simulación)
+        determinarEvento();
 
         // Acá llamamos un método distinto según el evento que corresponda a la fila actual
-        if (vectorEstadoProximo.getEvento() == Evento.LLEGADA_CLIENTE) {
+        if (vectorEstadoProximo.getEvento().getEvento() == Evento.LLEGADA_CLIENTE) {
             receptarCliente();
         } else {
             finalizarAtencion();
@@ -143,6 +144,7 @@ public class Simulacion {
 
         // Actualizamos el vector estado
         actualizarPeluqueros(peluquero, finAtencion);
+        vectorEstadoProximo.getEvento().setString("Llegada del cliente " + cliente.getId());
         vectorEstadoProximo.getListaClientes().addAll(vectorEstado.getListaClientes());
         vectorEstadoProximo.getListaClientes().add(cliente);
         vectorEstadoProximo.setAcumuladorGanancias(vectorEstado.getAcumuladorGanancias());
@@ -192,6 +194,7 @@ public class Simulacion {
 
         // Actualziamos vector estado
         actualizarPeluqueros(peluquero, finAtencion);
+        vectorEstadoProximo.getEvento().setString("Fin atención del cliente " + cliente.getId() + " (" + peluquero.getNombre() + ")");
         vectorEstadoProximo.getListaClientes().remove(cliente);
         vectorEstadoProximo.setAcumuladorGanancias(vectorEstado.getAcumuladorGanancias() + peluquero.getTarifa());
     }
@@ -254,7 +257,7 @@ public class Simulacion {
         vectorEstadoProximo.setProximaLlegada(vectorEstado.getProximaLlegada());
     }
 
-    private void determinarReloj() {
+    private void determinarEvento() {
         float proximoReloj;
         float proximaLlegada = vectorEstado.getProximaLlegada();
         float finAtencionMin = vectorEstado.getPeluqueros().stream()
@@ -265,10 +268,11 @@ public class Simulacion {
 
         if (proximaLlegada < finAtencionMin) {
             proximoReloj = proximaLlegada;
-            vectorEstadoProximo.setEvento(Evento.LLEGADA_CLIENTE);
+            vectorEstadoProximo.getEvento().setEvento(Evento.LLEGADA_CLIENTE);
+
         } else {
             proximoReloj = finAtencionMin;
-            vectorEstadoProximo.setEvento(Evento.FIN_ATENCION);
+            vectorEstadoProximo.getEvento().setEvento(Evento.FIN_ATENCION);
         }
 
         vectorEstadoProximo.setRelojTotal(proximoReloj);

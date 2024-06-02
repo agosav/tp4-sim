@@ -17,7 +17,7 @@ import java.util.List;
 public class VectorEstado {
 
     @Builder.Default
-    private Evento evento = Evento.INICIALIZACION;
+    private EventoDto evento = EventoDto.builder().build();
 
     private float relojTotal;
 

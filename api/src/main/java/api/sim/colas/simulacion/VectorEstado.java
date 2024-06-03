@@ -1,9 +1,10 @@
-package api.sim.colas.dtos;
+package api.sim.colas.simulacion;
 
 import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
+import api.sim.colas.utils.Distribucion;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class VectorEstado {
     public float calcularProximaLlegada(float a, float b) {
         float random = (float) Math.random();
 
-        float tiempoEntreLlegadas = a + random * (b - a);
+        float tiempoEntreLlegadas = Distribucion.uniforme(random, a, b);
 
         this.random1 = random;
         this.tiempoEntreLlegadas = tiempoEntreLlegadas;
@@ -104,7 +105,7 @@ public class VectorEstado {
         float a = peluquero.getTiempoAtencionMin();
         float b = peluquero.getTiempoAtencionMax();
 
-        float tiempoAtencion = a + random * (b - a);
+        float tiempoAtencion = Distribucion.uniforme(random, a, b);
         float finAtencion = relojDia + tiempoAtencion;
 
         this.random3 = random;
@@ -209,7 +210,7 @@ public class VectorEstado {
 
         if (evento == Evento.INICIALIZACION) {
             float random = (float) Math.random();
-            float tiempoEntreLlegadas = tiempoLlegadaMin + random * (tiempoLlegadaMax - tiempoLlegadaMin);
+            float tiempoEntreLlegadas = Distribucion.uniforme(random, tiempoLlegadaMin, tiempoLlegadaMax);
             this.random1 = random;
             this.tiempoEntreLlegadas = tiempoEntreLlegadas;
             this.proximaLlegada = tiempoEntreLlegadas;
@@ -326,8 +327,8 @@ public class VectorEstado {
         this.acumuladorGanancias += peluquero.getTarifa();
     }
 
-    public boolean esLaUltimaFila(int n) {
-        return proximaLlegada == null && clientes.isEmpty() && dia == n - 1;
+    public boolean esLaUltimaFila(int n, int contador) {
+        return proximaLlegada == null && clientes.isEmpty() && dia == n - 1 || contador == 100000;
     }
 
 }

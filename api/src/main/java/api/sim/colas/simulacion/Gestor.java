@@ -1,19 +1,19 @@
-package api.sim.colas.services;
+package api.sim.colas.simulacion;
 
 import api.sim.colas.dtos.IdPeluqueroDto;
 import api.sim.colas.dtos.ParametrosDto;
-import api.sim.colas.dtos.VectorEstado;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
 import api.sim.colas.utils.Auxiliar;
+import api.sim.colas.utils.Distribucion;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class Simulacion {
+public class Gestor {
 
     // Tiempo mínimo de llegada de los clientes
     private float tiempoLlegadaMin;
@@ -49,18 +49,16 @@ public class Simulacion {
         // Simulación
         while (true) {
             int hora = vectorEstado.getHoraTotal();
-            int dia = vectorEstado.getDia();
-            boolean esLaUltimaFila = vectorEstado.esLaUltimaFila(n);
+            boolean esLaUltimaFila = vectorEstado.esLaUltimaFila(n, contador);
 
             // Agregar vector a la tabla que se va a mostrar
             if (j <= hora && i >= 0 || esLaUltimaFila) {
                 tabla.add(vectorEstado);
                 i--;
-            }
 
-            // Cortar simulacion cuando se llegó al día n, o cuando se simularon 100 mil filas
-            if (esLaUltimaFila || contador == 100000) {
-                break;
+                if (esLaUltimaFila) {
+                    break;
+                }
             }
 
             vectorEstado = simularUnaFila(vectorEstado);
@@ -88,7 +86,7 @@ public class Simulacion {
         this.probabilidadesAtencion = Auxiliar.calcularProbabilidadesAcumuladas(dto);
 
         float random = (float) Math.random();
-        float tiempoEntreLlegadas = tiempoLlegadaMin + random * (tiempoLlegadaMax - tiempoLlegadaMin);
+        float tiempoEntreLlegadas = Distribucion.uniforme(random, tiempoLlegadaMin, tiempoLlegadaMax);
 
         return VectorEstado.builder()
                 .peluqueros(Auxiliar.inicializarPeluqueros(dto))

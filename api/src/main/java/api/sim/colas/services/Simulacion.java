@@ -29,24 +29,6 @@ public class Simulacion {
     // ------------ Funciones para la generación y corrida de la simulación ---------------
     // ------------------------------------------------------------------------------------
 
-    // Este método inicializa el sistema y setea todos los parámetros del usuario
-    private VectorEstado inicializar(ParametrosDto dto) {
-        this.tiempoLlegadaMin = dto.getTiempoLlegadaMin();
-        this.tiempoLlegadaMax = dto.getTiempoLlegadaMax();
-        this.peluqueros = Auxiliar.inicializarPeluqueros(dto);
-        this.probabilidadesAtencion = Auxiliar.calcularProbabilidadesAcumuladas(dto);
-
-        float random1 = (float) Math.random();
-        float tiempoEntreLlegadas = tiempoLlegadaMin + random1 * (tiempoLlegadaMax - tiempoLlegadaMin);
-
-        return VectorEstado.builder()
-                .peluqueros(peluqueros)
-                .random1(random1)
-                .tiempoEntreLlegadas(tiempoEntreLlegadas)
-                .proximaLlegada(tiempoEntreLlegadas)
-                .build();
-    }
-
     // Este método inicializa la simulación y la corre
     public List<VectorEstado> realizarSimulacion(ParametrosDto dto) {
         VectorEstado vectorEstado = inicializar(dto);
@@ -54,12 +36,29 @@ public class Simulacion {
 
         for (int iteracion = 0; iteracion < dto.getN(); iteracion++) {
             tabla.add(vectorEstado);
-            VectorEstado nuevo = simularUnaFila(vectorEstado);
-            vectorEstado = nuevo;
+            vectorEstado = simularUnaFila(vectorEstado);
         }
 
         return tabla;
 
+    }
+
+    // Este método inicializa el sistema y setea todos los parámetros del usuario
+    private VectorEstado inicializar(ParametrosDto dto) {
+        this.tiempoLlegadaMin = dto.getTiempoLlegadaMin();
+        this.tiempoLlegadaMax = dto.getTiempoLlegadaMax();
+        this.peluqueros = Auxiliar.inicializarPeluqueros(dto);
+        this.probabilidadesAtencion = Auxiliar.calcularProbabilidadesAcumuladas(dto);
+
+        float random = (float) Math.random();
+        float tiempoEntreLlegadas = tiempoLlegadaMin + random * (tiempoLlegadaMax - tiempoLlegadaMin);
+
+        return VectorEstado.builder()
+                .peluqueros(peluqueros)
+                .random1(random)
+                .tiempoEntreLlegadas(tiempoEntreLlegadas)
+                .proximaLlegada(tiempoEntreLlegadas)
+                .build();
     }
 
     // Este método se encarga de simular 1 fila.
@@ -68,12 +67,14 @@ public class Simulacion {
 
         // Este método determina el evento (llegada cliente o fin simulación)
         Evento evento = vectorProximo.determinarEvento(vectorAnterior);
-        vectorProximo.duplicarVector(vectorAnterior, evento);
+        vectorProximo.duplicarVector(vectorAnterior, evento, tiempoLlegadaMin, tiempoLlegadaMax);
 
         // Acá llamamos un método distinto según el evento que corresponda a la fila actual
         if (evento == Evento.LLEGADA_CLIENTE) {
             receptarCliente(vectorAnterior, vectorProximo);
-        } else {
+        }
+
+        if (evento == Evento.FIN_ATENCION) {
             finalizarAtencion(vectorAnterior, vectorProximo);
         }
 

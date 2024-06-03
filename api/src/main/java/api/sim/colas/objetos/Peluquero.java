@@ -3,8 +3,6 @@ package api.sim.colas.objetos;
 import api.sim.colas.enums.EstadoPeluquero;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 @Builder
@@ -28,10 +26,6 @@ public class Peluquero {
     private float tiempoAtencionMin;  // a
 
     private float tiempoAtencionMax;  // b
-
-    public boolean estaLibre() {
-        return estado == EstadoPeluquero.LIBRE;
-    }
 
     public boolean estaOcupado() {
         return estado == EstadoPeluquero.OCUPADO;

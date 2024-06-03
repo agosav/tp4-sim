@@ -22,13 +22,20 @@ public class VectorEstado {
     @Builder.Default
     private String evento = "Inicialización";
 
-    private float reloj;
+    private float relojTotal;
+
+    private float relojDia;
+
+    private int hora;
+
+    @Builder.Default
+    private int dia = 1;
 
     private Float random1;
 
     private Float tiempoEntreLlegadas;
 
-    private float proximaLlegada;
+    private Float proximaLlegada;
 
     private Float random2;
 
@@ -55,7 +62,7 @@ public class VectorEstado {
 
         this.random1 = random;
         this.tiempoEntreLlegadas = tiempoEntreLlegadas;
-        this.proximaLlegada = reloj + tiempoEntreLlegadas;
+        this.proximaLlegada = relojDia + tiempoEntreLlegadas;
 
         return proximaLlegada;
     }
@@ -83,7 +90,7 @@ public class VectorEstado {
         float b = peluquero.getTiempoAtencionMax();
 
         float tiempoAtencion = a + random * (b - a);
-        float finAtencion = reloj + tiempoAtencion;
+        float finAtencion = relojDia + tiempoAtencion;
 
         this.random3 = random;
         this.tiempoAtencion = tiempoAtencion;
@@ -96,30 +103,49 @@ public class VectorEstado {
     // ------------------------------------------------------------------------------------
 
     public Evento determinarEvento(VectorEstado vectorAnterior) {
+        this.dia = vectorAnterior.getDia();
+
         float proximoReloj;
         Evento proximoEvento;
 
-        float proximaLlegada = vectorAnterior.getProximaLlegada();
+        Float proximaLlegada = vectorAnterior.getProximaLlegada();
         float finAtencionMin = vectorAnterior.getPeluqueros().stream()
                 .map(Peluquero::getFinAtencion)
                 .filter(Objects::nonNull)
                 .min(Float::compare)
                 .orElse(Float.MAX_VALUE);
 
-        if (proximaLlegada < finAtencionMin) {
-            proximoReloj = proximaLlegada;
-            proximoEvento = Evento.LLEGADA_CLIENTE;
+        if (proximaLlegada != null) {
+            if (proximaLlegada < finAtencionMin && hora <= 8) {
+                proximoReloj = proximaLlegada;
+                proximoEvento = Evento.LLEGADA_CLIENTE;
+            } else {
+                proximoReloj = finAtencionMin;
+                proximoEvento = Evento.FIN_ATENCION;
+            }
         } else {
-            proximoReloj = finAtencionMin;
-            proximoEvento = Evento.FIN_ATENCION;
+            if (!vectorAnterior.getListaClientes().isEmpty()) {
+                proximoReloj = finAtencionMin;
+                proximoEvento = Evento.FIN_ATENCION;
+            } else {
+                proximoReloj = 0;
+                proximoEvento = Evento.INICIALIZACION;
+            }
         }
 
-        this.reloj = proximoReloj;
+        this.relojDia = proximoReloj;
+        this.relojTotal = Math.max(relojDia - vectorAnterior.getRelojDia(), 0) + vectorAnterior.getRelojTotal();
+
+        if (proximoReloj == 0) {
+            this.dia = vectorAnterior.getDia() + 1;
+        }
+
+        this.hora = (int) Math.ceil(relojDia / 60);
 
         return proximoEvento;
     }
 
-    public void duplicarVector(VectorEstado vectorAnterior, Evento evento) {
+    public void duplicarVector(VectorEstado vectorAnterior, Evento evento, float tiempoLlegadaMin, float tiempoLlegadaMax) {
         this.peluqueros = new ArrayList<>();
         for (Peluquero peluquero : vectorAnterior.getPeluqueros()) {
             this.peluqueros.add(Auxiliar.construirPeluquero(peluquero, peluquero.getFinAtencion()));
@@ -129,8 +155,17 @@ public class VectorEstado {
             this.listaClientes.add(Auxiliar.construirCliente(cliente));
         }
 
-        if (evento == Evento.FIN_ATENCION) {
+        Float proximaLlegada = vectorAnterior.getProximaLlegada();
+        if (evento == Evento.FIN_ATENCION && proximaLlegada != null && proximaLlegada < 480) {
             this.proximaLlegada = vectorAnterior.getProximaLlegada();
+        }
+
+        if (evento == Evento.INICIALIZACION) {
+            float random = (float) Math.random();
+            float tiempoEntreLlegadas = tiempoLlegadaMin + random * (tiempoLlegadaMax - tiempoLlegadaMin);
+            this.random1 = random;
+            this.tiempoEntreLlegadas = tiempoEntreLlegadas;
+            this.proximaLlegada = tiempoEntreLlegadas;
         }
     }
 
@@ -152,7 +187,7 @@ public class VectorEstado {
         for (Peluquero value : peluqueros) {
             peluquero = value;
             Float finAtencion = peluquero.getFinAtencion();
-            if (finAtencion != null && finAtencion == reloj) {
+            if (finAtencion != null && finAtencion == relojDia) {
                 break;
             }
         }

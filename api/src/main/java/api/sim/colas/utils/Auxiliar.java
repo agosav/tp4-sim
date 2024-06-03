@@ -77,5 +77,4 @@ public class Auxiliar {
                 .peluquero(original.getPeluquero())
                 .build();
     }
-
 }

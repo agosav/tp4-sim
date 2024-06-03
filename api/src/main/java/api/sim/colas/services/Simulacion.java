@@ -59,7 +59,7 @@ public class Simulacion {
             }
 
             // Cortar simulacion cuando se llegó al día n, o cuando se simularon 100 mil filas
-            if (dia == n || contador == 100000) {
+            if (esLaUltimaFila || contador == 100000) {
                 break;
             }
 

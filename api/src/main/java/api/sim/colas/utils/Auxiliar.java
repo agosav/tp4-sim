@@ -1,9 +1,7 @@
 package api.sim.colas.utils;
 
 import api.sim.colas.dtos.ParametrosDto;
-import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
-
 import java.util.List;
 
 public class Auxiliar {
@@ -56,25 +54,4 @@ public class Auxiliar {
         return acumuladas;
     }
 
-    public static Peluquero construirPeluquero(Peluquero original, Float finAtencion) {
-        return Peluquero.builder()
-                .id(original.getId())
-                .nombre(original.getNombre())
-                .estado(original.getEstado())
-                .tiempoAtencionMax(original.getTiempoAtencionMax())
-                .tiempoAtencionMin(original.getTiempoAtencionMin())
-                .cola(original.getCola())
-                .tarifa(original.getTarifa())
-                .finAtencion(finAtencion)
-                .build();
-    }
-
-    public static Cliente construirCliente(Cliente original) {
-        return Cliente.builder()
-                .id(original.getId())
-                .estado(original.getEstado())
-                .acumuladorTiempoEspera(original.getAcumuladorTiempoEspera())
-                .peluquero(original.getPeluquero())
-                .build();
-    }
 }

@@ -1,11 +1,9 @@
 package api.sim.colas.dtos;
 
-
 import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
-import api.sim.colas.utils.Auxiliar;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -19,40 +17,57 @@ import java.util.Objects;
 @Data
 public class VectorEstado {
 
+    // String que especifica el evento simulado
     @Builder.Default
     private String evento = "Inicialización";
 
+    // Acumulador de todos las minutos de la simulacion
     private float relojTotal;
 
+    // Acumulador de todas las horas de la simulacion
+    private int horaTotal;
+
+    // Reloj en minutos del día actual
     private float relojDia;
 
-    private int hora;
+    // Hora del día
+    // Si el relojDia está entre 0 y 59, la hora es 1.
+    // Si el relojDia está entre 60 y 119, la hora es 2. Etc
+    private int horaDia;
 
+    // Contador de días simulados en toda la simulación
     @Builder.Default
     private int dia = 1;
 
+    // Para determinar la próxima llegada
     private Float random1;
-
     private Float tiempoEntreLlegadas;
-
     private Float proximaLlegada;
 
+    // Para determinar qué peluquero va a atender al cliente
     private Float random2;
-
     private String nombreQuienAtiende;
 
+    // Para determinar tiempo de atención
     private Float random3;
-
     private Float tiempoAtencion;
 
+    // Lista con los peluqueros
     @Builder.Default
     private List<Peluquero> peluqueros = new ArrayList<>();
 
+    // Variables estadísticas
+    private float acumuladorCostos;
+    private float acumuladorGanancias;
+    private float promedioRecaudacionDiaria;
+    private int sillasNecesarias;
+
+    // Lista con los clientes
     @Builder.Default
-    private List<Cliente> listaClientes = new ArrayList<>();
+    private List<Cliente> clientes = new ArrayList<>();
 
     // ------------------------------------------------------------------------------------
-    //  Funciones encargadas de determinar calcular los valores de las variables aleatorias
+    // ---- Funciones encargadas de calcular los valores de las variables aleatorias ------
     // ------------------------------------------------------------------------------------
 
     public float calcularProximaLlegada(float a, float b) {
@@ -99,9 +114,20 @@ public class VectorEstado {
     }
 
     // ------------------------------------------------------------------------------------
-    // ------------------------------- Otras funciones ------------------------------------
+    // ------------------- Funciones con la lógica de la simulación -----------------------
     // ------------------------------------------------------------------------------------
 
+    /**
+     * Calcula y setea los atributos:
+     * - relojTotal
+     * - horaTotal
+     * - relojDia
+     * - horaDia
+     * - dia
+     *
+     * @param vectorAnterior: vector estado de la fila anterior
+     * @return EVENTO de la fila actual
+     */
     public Evento determinarEvento(VectorEstado vectorAnterior) {
         this.dia = vectorAnterior.getDia();
 
@@ -116,7 +142,7 @@ public class VectorEstado {
                 .orElse(Float.MAX_VALUE);
 
         if (proximaLlegada != null) {
-            if (proximaLlegada < finAtencionMin && hora <= 8) {
+            if (proximaLlegada < finAtencionMin && horaDia <= 8) {
                 proximoReloj = proximaLlegada;
                 proximoEvento = Evento.LLEGADA_CLIENTE;
             } else {
@@ -124,7 +150,7 @@ public class VectorEstado {
                 proximoEvento = Evento.FIN_ATENCION;
             }
         } else {
-            if (!vectorAnterior.getListaClientes().isEmpty()) {
+            if (!vectorAnterior.getClientes().isEmpty()) {
                 proximoReloj = finAtencionMin;
                 proximoEvento = Evento.FIN_ATENCION;
             } else {
@@ -133,26 +159,47 @@ public class VectorEstado {
             }
         }
 
-        this.relojDia = proximoReloj;
-        this.relojTotal = Math.max(relojDia - vectorAnterior.getRelojDia(), 0) + vectorAnterior.getRelojTotal();
-
         if (proximoReloj == 0) {
             this.dia = vectorAnterior.getDia() + 1;
         }
 
-        this.hora = (int) Math.ceil(relojDia / 60);
+        this.relojDia = proximoReloj;
+        this.relojTotal = Math.max(relojDia - vectorAnterior.getRelojDia(), 0) + vectorAnterior.getRelojTotal();
+
+        this.horaDia = (int) Math.ceil(relojDia / 60);
+        this.horaTotal = Math.max(horaDia - vectorAnterior.getHoraDia(), 0) + vectorAnterior.getHoraTotal();
 
         return proximoEvento;
     }
 
+
+    /**
+     * Este método duplica en el nuevo vector estado todos aquellos atributos que necesitamos.
+     * En caso de que sea evento INICIALIZACIÓN, setea los atributos relacionados a la próxima llegada.
+     * Atributos que duplica:
+     * - peluqueros
+     * - clientes
+     * - acumuladorGanancias
+     * - acumuladorCostos
+     * - proximaLlegada (en caso de que sea evento FIN_ATENCION)
+     *
+     * @param vectorAnterior:   vector estado de la fila anterior
+     * @param evento:           evento de la fila actual
+     * @param tiempoLlegadaMin: tiempo mínimo de llegada de los clientes
+     * @param tiempoLlegadaMax: tiempo máximo de llegada de los clientes
+     */
     public void duplicarVector(VectorEstado vectorAnterior, Evento evento, float tiempoLlegadaMin, float tiempoLlegadaMax) {
+        this.acumuladorGanancias = vectorAnterior.getAcumuladorGanancias();
+        this.acumuladorCostos = vectorAnterior.getAcumuladorCostos();
+        this.sillasNecesarias = vectorAnterior.getSillasNecesarias();
+
         this.peluqueros = new ArrayList<>();
         for (Peluquero peluquero : vectorAnterior.getPeluqueros()) {
-            this.peluqueros.add(Auxiliar.construirPeluquero(peluquero, peluquero.getFinAtencion()));
+            this.peluqueros.add(peluquero.clone());
         }
-        this.listaClientes = new ArrayList<>();
-        for (Cliente cliente : vectorAnterior.getListaClientes()) {
-            this.listaClientes.add(Auxiliar.construirCliente(cliente));
+        this.clientes = new ArrayList<>();
+        for (Cliente cliente : vectorAnterior.getClientes()) {
+            this.clientes.add(cliente.clone());
         }
 
         Float proximaLlegada = vectorAnterior.getProximaLlegada();
@@ -169,17 +216,44 @@ public class VectorEstado {
         }
     }
 
-    public void actualizarStringEvento(String stringEvento) {
-        this.evento = stringEvento;
+    /**
+     * Este método se llama al final de simular toda la fila, y actualiza todas las variables estadísticas.
+     * Actualiza:
+     * - Tiempos de espera de los clientes que estaban esperando
+     * - sillasNecesarias
+     * - promedioRecaudacionDiaria
+     */
+    public void actualizarVariablesEstadisticas() {
+        for (Cliente c : clientes) {
+            if (c.getEstado() == EstadoCliente.ESPERANDO_ATENCION) {
+                actualizarAcumulador(c);
+            }
+        }
+
+        // (Máximo valor entre: valor anterior y la suma de clientes actualmente en cola)
+        this.sillasNecesarias = Math.max(sillasNecesarias, peluqueros.stream().mapToInt(Peluquero::getCola).sum());
+
+        this.promedioRecaudacionDiaria = (acumuladorGanancias - acumuladorCostos) / dia;
     }
 
-    public void agregarCliente(Cliente cliente) {
-        this.listaClientes.add(Auxiliar.construirCliente(cliente));
+    /**
+     * Este método actualiza el acumulador de tiempo de espera de UN cliente concreto que estaba esperando.
+     *
+     * @param cliente: cliente a actualizar
+     */
+    public void actualizarAcumulador(Cliente cliente) {
+        float acumulador = relojDia - cliente.getLlegada();
+        cliente.setAcumuladorTiempoEspera(acumulador);
+        actualizarCliente(cliente);
+
+        if (acumulador >= 30) {
+            this.acumuladorCostos += 1500;
+        }
     }
 
-    public void quitarCliente(Cliente cliente) {
-        this.listaClientes.remove(cliente);
-    }
+    // ------------------------------------------------------------------------------------
+    // ---------------------------- Funciones auxiliares ----------------------------------
+    // ------------------------------------------------------------------------------------
 
     public Peluquero determinarQuePeluqueroFinalizoAtencion() {
         Peluquero peluquero = null;
@@ -198,21 +272,34 @@ public class VectorEstado {
     }
 
     public Cliente determinarClienteRecienAtendido(Peluquero peluquero) {
-        return listaClientes.stream()
+        return clientes.stream()
                 .filter(c -> c.getPeluquero().getId() == peluquero.getId() && c.getEstado() == EstadoCliente.SIENDO_ATENDIDO)
                 .findFirst()
                 .orElse(null);
     }
 
     public Cliente determinarProximoClienteEnCola(Peluquero peluquero) {
-        return listaClientes.stream()
+        return clientes.stream()
                 .filter(c -> c.getPeluquero().getId() == peluquero.getId() && c.getEstado() == EstadoCliente.ESPERANDO_ATENCION)
                 .findFirst()
                 .orElse(null);
     }
 
+    public void actualizarStringEvento(String stringEvento) {
+        this.evento = stringEvento;
+    }
+
+    public void agregarCliente(Cliente cliente) {
+        this.clientes.add(cliente.clone());
+    }
+
+    public void quitarCliente(Cliente cliente) {
+        this.clientes.remove(cliente);
+    }
+
     public void actualizarPeluquero(Peluquero peluquero, Float finAtencion) {
-        Peluquero peluqueroActualizado = Auxiliar.construirPeluquero(peluquero, finAtencion);
+        peluquero.setFinAtencion(finAtencion);
+        Peluquero peluqueroActualizado = peluquero.clone();
         this.peluqueros.set(peluquero.getId(), peluqueroActualizado);
     }
 
@@ -221,10 +308,10 @@ public class VectorEstado {
     }
 
     public void actualizarCliente(Cliente cliente) {
-        Cliente clienteActualizado = Auxiliar.construirCliente(cliente);
+        Cliente clienteActualizado = cliente.clone();
         List<Cliente> listaActualizada = new ArrayList<>();
 
-        for (Cliente c : listaClientes) {
+        for (Cliente c : clientes) {
             if (c.getId() == cliente.getId()) {
                 listaActualizada.add(clienteActualizado);
             } else {
@@ -232,7 +319,11 @@ public class VectorEstado {
             }
         }
 
-        this.listaClientes = listaActualizada;
+        this.clientes = listaActualizada;
+    }
+
+    public void cobrarAtencion(Peluquero peluquero) {
+        this.acumuladorGanancias += peluquero.getTarifa();
     }
 
 }

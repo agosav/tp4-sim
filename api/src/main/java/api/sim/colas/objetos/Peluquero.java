@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Peluquero {
+public class Peluquero implements Cloneable {
 
     private int id;
 
@@ -49,6 +49,15 @@ public class Peluquero {
 
     public void sumarClienteACola() {
         this.cola++;
+    }
+
+    @Override
+    public Peluquero clone() {
+        try {
+            return (Peluquero) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 
 }

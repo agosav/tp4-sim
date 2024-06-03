@@ -8,28 +8,33 @@ import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
 import api.sim.colas.utils.Auxiliar;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class Simulacion {
 
+    // Tiempo mínimo de llegada de los clientes
     private float tiempoLlegadaMin;
 
+    // Tiempo  máximo de llegada de los clientes
     private float tiempoLlegadaMax;
 
-    private List<Peluquero> peluqueros;
-
+    // Lista con las probabilidades acumuladas para determinar el peluquero de un cliente
     private float[] probabilidadesAtencion;
 
-    private int nextIdCliente = 0;
+    // Próxima id de cliente disponible
+    private int nextIdCliente;
 
     // ------------------------------------------------------------------------------------
     // ------------ Funciones para la generación y corrida de la simulación ---------------
     // ------------------------------------------------------------------------------------
 
-    // Este método inicializa la simulación y la corre
+    /**
+     * Método encargado de inicializar toda la simulación y correrla.
+     * @param dto: Data Transfer Object para recibir todos los parámetros del usuario
+     * @return lista con todos los vectores estado que se van a mostrar
+     */
     public List<VectorEstado> realizarSimulacion(ParametrosDto dto) {
         VectorEstado vectorEstado = inicializar(dto);
         List<VectorEstado> tabla = new ArrayList<>();
@@ -43,25 +48,33 @@ public class Simulacion {
 
     }
 
-    // Este método inicializa el sistema y setea todos los parámetros del usuario
+    /**
+     * Método encargado de setear uno por uno todos los parámetros y de crear el primer vector estado.
+     * @param dto: Data Transfer Object para recibir todos los parámetros del usuario
+     * @return primer vector estado de toda la simulación
+     */
     private VectorEstado inicializar(ParametrosDto dto) {
+        this.nextIdCliente = 0;
         this.tiempoLlegadaMin = dto.getTiempoLlegadaMin();
         this.tiempoLlegadaMax = dto.getTiempoLlegadaMax();
-        this.peluqueros = Auxiliar.inicializarPeluqueros(dto);
         this.probabilidadesAtencion = Auxiliar.calcularProbabilidadesAcumuladas(dto);
 
         float random = (float) Math.random();
         float tiempoEntreLlegadas = tiempoLlegadaMin + random * (tiempoLlegadaMax - tiempoLlegadaMin);
 
         return VectorEstado.builder()
-                .peluqueros(peluqueros)
+                .peluqueros(Auxiliar.inicializarPeluqueros(dto))
                 .random1(random)
                 .tiempoEntreLlegadas(tiempoEntreLlegadas)
                 .proximaLlegada(tiempoEntreLlegadas)
                 .build();
     }
 
-    // Este método se encarga de simular 1 fila.
+    /**
+     * Método encargado de simular una fila nueva
+     * @param vectorAnterior: vector estado de la fila anterior
+     * @return vector estado nuevo
+     */
     private VectorEstado simularUnaFila(VectorEstado vectorAnterior) {
         VectorEstado vectorProximo = VectorEstado.builder().build();
 
@@ -75,8 +88,14 @@ public class Simulacion {
         }
 
         if (evento == Evento.FIN_ATENCION) {
-            finalizarAtencion(vectorAnterior, vectorProximo);
+            finalizarAtencion(vectorProximo);
         }
+
+        if (evento == Evento.INICIALIZACION) {
+            iniciarNuevoDia(vectorProximo);
+        }
+
+        vectorProximo.actualizarVariablesEstadisticas();
 
         return vectorProximo;
     }
@@ -85,58 +104,98 @@ public class Simulacion {
     // ---------------------- Funciones encargadas de cada evento -------------------------
     // ------------------------------------------------------------------------------------
 
+    /**
+     * Método encargado de toda la funcionalidad para el evento LLEGADA_CLIENTE.
+     * @param vectorAnterior: vector estado de la fila anterior
+     * @param vectorProximo: vector estado nuevo.
+     * @return
+     */
     private VectorEstado receptarCliente(VectorEstado vectorAnterior, VectorEstado vectorProximo) {
-        // Creamos objeto cliente
+        // Creamos el nuevo objeto cliente
         this.nextIdCliente++;
-        Cliente cliente = Cliente.builder().id(nextIdCliente).build();
+        Cliente cliente = Cliente.builder().id(nextIdCliente).llegada(vectorProximo.getRelojDia()).build();
+        vectorProximo.actualizarStringEvento("Llegada del cliente " + cliente.getId());
 
-        // Calculamos el valor de la próxima llegada de un cliente
+        // Calculamos la próxima llegada de un cliente
         vectorProximo.calcularProximaLlegada(tiempoLlegadaMin, tiempoLlegadaMax);
 
         // Determinamos quién va a atender a este cliente
         Peluquero peluquero = vectorProximo.determinarQuienLoAtiende(probabilidadesAtencion);
         cliente.setPeluquero(IdPeluqueroDto.fromPeluquero(peluquero));
 
-        // Si el peluquero está ocupado,  sumamos 1 a su cola y ponemos al cliente en estado Esperando Atención
+        /*
+        Si el peluquero está ocupado:
+            - Sumamos 1 a su cola
+            - Ponemos al cliente en estado ESPERANDO_ATENCION
+            - Duplicamos el valor que tenía el peluquero en finAtencion
+        */
         Float finAtencion;
         if (peluquero.estaOcupado()) {
             peluquero.sumarClienteACola();
             cliente.esperar();
             finAtencion = vectorAnterior.obtenerFinAtencionfromPeluquero(peluquero);
 
-        //Si el peluquero está libre, ponemos al peluquero en estado Ocupado y al cliente en estado Siendo atendido
+
+        /*
+        Si el peluquero está libre:
+            - Ponemos al peluquero en estado OCUPADO
+            - Ponemos al cliente en estado SIENDO_ATENDIDO
+            - Calculamos el tiempo de fin de atención
+        */
         } else {
             finAtencion = vectorProximo.determinarFinAtencion(peluquero);
             peluquero.atender();
             cliente.serAtendido();
         }
 
+        // Actualizamos vector estado
         vectorProximo.actualizarPeluquero(peluquero, finAtencion);
-        vectorProximo.actualizarStringEvento("Llegada del cliente " + cliente.getId());
         vectorProximo.agregarCliente(cliente);
 
         return vectorProximo;
     }
 
-    private VectorEstado finalizarAtencion(VectorEstado vectorAnterior, VectorEstado vectorProximo) {
-        // Buscamos al peluquero y al cliente involucrados en el Fin de atención
+    /**
+     * Método encargado de toda la funcionalidad para el evento FIN_ATENCION.
+     * @param vectorProximo: vector estado nuevo
+     * @return
+     */
+    private VectorEstado finalizarAtencion(VectorEstado vectorProximo) {
+        // Buscamos al peluquero y al cliente involucrados en este fin de atención
         Peluquero peluquero = vectorProximo.determinarQuePeluqueroFinalizoAtencion();
         Cliente cliente = vectorProximo.determinarClienteRecienAtendido(peluquero);
+        vectorProximo.actualizarStringEvento("Fin atención del cliente " + cliente.getId() + " (" + peluquero.getNombre() + ")");
 
-        // Si el peluquero tiene cola, ponemos en estado Siendo Atendido al próximo cliente
+        /*
+        Si el peluquero tiene cola:
+            - Dejamos al peluquero en estado ocupado
+            - Buscamos al primer cliente en la cola y lo ponemos en estado SIENDO_ATENDIDO
+            - Calculamos el tiempo de fin de atención
+        */
+        // Si el peluquero tiene cola: ponemos en estado Siendo Atendido al próximo cliente
         Float finAtencion = null;
         if (peluquero.tieneCola()) {
             Cliente siguienteCliente = vectorProximo.determinarProximoClienteEnCola(peluquero);
             finAtencion = vectorProximo.determinarFinAtencion(peluquero);
             siguienteCliente.serAtendido();
+            vectorProximo.actualizarAcumulador(siguienteCliente);
             vectorProximo.actualizarCliente(siguienteCliente);
         }
 
+        // Actualizamos los atributos del peluquero
         peluquero.terminarAtencion();
 
-        vectorProximo.actualizarStringEvento("Fin atención del cliente " + cliente.getId() + " (" + peluquero.getNombre() + ")");
+        // Actualizamos vector estado
+        vectorProximo.cobrarAtencion(peluquero);
         vectorProximo.quitarCliente(cliente);
         vectorProximo.actualizarPeluquero(peluquero, finAtencion);
+
+        return vectorProximo;
+    }
+
+    public VectorEstado iniciarNuevoDia(VectorEstado vectorProximo) {
+        int diaActual = vectorProximo.getDia();
+        vectorProximo.actualizarStringEvento("Inicialización del día " + diaActual);
 
         return vectorProximo;
     }

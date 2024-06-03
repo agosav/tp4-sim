@@ -1,19 +1,20 @@
 package api.sim.colas.objetos;
 
 import api.sim.colas.dtos.IdPeluqueroDto;
-import api.sim.colas.dtos.PeluqueroDto;
 import api.sim.colas.enums.EstadoCliente;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class Cliente {
+public class Cliente implements Cloneable {
 
     private int id;
 
     @Builder.Default
     private EstadoCliente estado = EstadoCliente.INICIALIZADO;
+
+    private float llegada;
 
     private float acumuladorTiempoEspera;
 
@@ -25,6 +26,15 @@ public class Cliente {
 
     public void esperar() {
         this.estado = EstadoCliente.ESPERANDO_ATENCION;
+    }
+
+    @Override
+    public Cliente clone() {
+        try {
+            return (Cliente) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 
 }

@@ -76,8 +76,12 @@ public class Gestor {
      * @return primer vector estado de toda la simulación
      */
     private VectorEstado inicializar(ParametrosDto dto) {
-        if (dto.getI() > 100000 || dto.getN() > 100000) {
-            throw new IllegalArgumentException("No se pueden simular más de 100.000 filas");
+        if (dto.getTiempoLlegadaMax() <= dto.getTiempoLlegadaMin() ||
+                dto.getTiempoAtencionMaxAprendiz() <= dto.getTiempoAtencionMinAprendiz() ||
+                dto.getTiempoAtencionMaxVeteranoA() <= dto.getTiempoAtencionMinVeteranoA() ||
+                dto.getTiempoAtencionMaxVeteranoB() <= dto.getTiempoAtencionMinVeteranoB()
+        ) {
+            throw new IllegalArgumentException("Al menos un parámetro de las distribuciones es inválido");
         }
 
         this.nextIdCliente = 0;

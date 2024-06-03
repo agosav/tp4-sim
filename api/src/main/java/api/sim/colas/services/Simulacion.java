@@ -40,19 +40,31 @@ public class Simulacion {
     public List<VectorEstado> realizarSimulacion(ParametrosDto dto) {
         VectorEstado vectorEstado = inicializar(dto);
         List<VectorEstado> tabla = new ArrayList<>();
-        int n = dto.getN();
-        int i = dto.getI();
-        int j = dto.getJ();
 
-        for (int iteracion = 1; iteracion < n + 1; iteracion++) {
+        int n = dto.getN() + 1;  // Cantidad de días a simular en total
+        int i = dto.getI();  // Cantidad de iteraciones a mostrar
+        int j = dto.getJ();  // Hora de la primera iteración a mostrar
+        int contador = 0;  // Contador de iteraciones
+
+        // Simulación
+        while (true) {
             int hora = vectorEstado.getHoraTotal();
-            if (j <= hora && i >= 0 || iteracion == n) {
+            int dia = vectorEstado.getDia();
+            boolean esLaUltimaFila = vectorEstado.esLaUltimaFila(n);
+
+            // Agregar vector a la tabla que se va a mostrar
+            if (j <= hora && i >= 0 || esLaUltimaFila) {
                 tabla.add(vectorEstado);
-                vectorEstado = simularUnaFila(vectorEstado);
                 i--;
             }
 
+            // Cortar simulacion cuando se llegó al día n, o cuando se simularon 100 mil filas
+            if (dia == n || contador == 100000) {
+                break;
+            }
+
             vectorEstado = simularUnaFila(vectorEstado);
+            contador++;
         }
 
         return tabla;
@@ -66,8 +78,8 @@ public class Simulacion {
      * @return primer vector estado de toda la simulación
      */
     private VectorEstado inicializar(ParametrosDto dto) {
-        if (dto.getI() > 100000) {
-            throw new IllegalArgumentException("La cantidad de iteraciones a mostrar debe ser menor a 100.000");
+        if (dto.getI() > 100000 || dto.getN() > 100000) {
+            throw new IllegalArgumentException("No se pueden simular más de 100.000 filas");
         }
 
         this.nextIdCliente = 0;

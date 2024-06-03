@@ -326,4 +326,8 @@ public class VectorEstado {
         this.acumuladorGanancias += peluquero.getTarifa();
     }
 
+    public boolean esLaUltimaFila(int n) {
+        return proximaLlegada == null && clientes.isEmpty() && dia == n - 1;
+    }
+
 }

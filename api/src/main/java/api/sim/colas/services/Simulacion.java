@@ -40,9 +40,18 @@ public class Simulacion {
     public List<VectorEstado> realizarSimulacion(ParametrosDto dto) {
         VectorEstado vectorEstado = inicializar(dto);
         List<VectorEstado> tabla = new ArrayList<>();
+        int n = dto.getN();
+        int i = dto.getI();
+        int j = dto.getJ();
 
-        for (int iteracion = 0; iteracion < dto.getN(); iteracion++) {
-            tabla.add(vectorEstado);
+        for (int iteracion = 1; iteracion < n + 1; iteracion++) {
+            int hora = vectorEstado.getHoraTotal();
+            if (j <= hora && i >= 0 || iteracion == n) {
+                tabla.add(vectorEstado);
+                vectorEstado = simularUnaFila(vectorEstado);
+                i--;
+            }
+
             vectorEstado = simularUnaFila(vectorEstado);
         }
 
@@ -57,6 +66,10 @@ public class Simulacion {
      * @return primer vector estado de toda la simulación
      */
     private VectorEstado inicializar(ParametrosDto dto) {
+        if (dto.getI() > 100000) {
+            throw new IllegalArgumentException("La cantidad de iteraciones a mostrar debe ser menor a 100.000");
+        }
+
         this.nextIdCliente = 0;
         this.tiempoLlegadaMin = dto.getTiempoLlegadaMin();
         this.tiempoLlegadaMax = dto.getTiempoLlegadaMax();

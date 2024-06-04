@@ -71,7 +71,6 @@ public class ParametrosDto {
 
     @NotNull
     @Positive
-    @Max(100000)
     private int n;
 
     @NotNull

@@ -16,7 +16,7 @@ public class Cliente implements Cloneable {
 
     private float llegada;
 
-    private float acumuladorTiempoEspera;
+    private Float acumuladorTiempoEspera;
 
     private IdPeluqueroDto peluquero;
 

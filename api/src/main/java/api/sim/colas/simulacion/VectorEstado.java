@@ -18,6 +18,9 @@ import java.util.Objects;
 @Data
 public class VectorEstado {
 
+    // Número de iteración
+    private int iteracion;
+
     // String que especifica el evento simulado
     @Builder.Default
     private String evento = "Inicialización";
@@ -26,7 +29,8 @@ public class VectorEstado {
     private float relojTotal;
 
     // Acumulador de todas las horas de la simulacion
-    private int horaTotal;
+    @Builder.Default
+    private int horaTotal = 1;
 
     // Reloj en minutos del día actual
     private float relojDia;
@@ -34,7 +38,8 @@ public class VectorEstado {
     // Hora del día
     // Si el relojDia está entre 0 y 59, la hora es 1.
     // Si el relojDia está entre 60 y 119, la hora es 2. Etc
-    private int horaDia;
+    @Builder.Default
+    private int horaDia = 1;
 
     // Contador de días simulados en toda la simulación
     @Builder.Default
@@ -131,16 +136,19 @@ public class VectorEstado {
      */
     public Evento determinarEvento(VectorEstado vectorAnterior) {
         this.dia = vectorAnterior.getDia();
+        this.iteracion = vectorAnterior.getIteracion();
 
         float proximoReloj;
         Evento proximoEvento;
 
         Float proximaLlegada = vectorAnterior.getProximaLlegada();
-        float finAtencionMin = vectorAnterior.getPeluqueros().stream()
-                .map(Peluquero::getFinAtencion)
-                .filter(Objects::nonNull)
-                .min(Float::compare)
-                .orElse(Float.MAX_VALUE);
+        float finAtencionMin = Float.MAX_VALUE;
+        for (Peluquero p : vectorAnterior.getPeluqueros()) {
+            Float finAtencion = p.getFinAtencion();
+            if (finAtencion != null && finAtencion < finAtencionMin) {
+                finAtencionMin = finAtencion;
+            }
+        }
 
         if (proximaLlegada != null) {
             if (proximaLlegada < finAtencionMin && horaDia <= 8) {
@@ -169,6 +177,8 @@ public class VectorEstado {
 
         this.horaDia = (int) Math.ceil(relojDia / 60);
         this.horaTotal = Math.max(horaDia - vectorAnterior.getHoraDia(), 0) + vectorAnterior.getHoraTotal();
+
+        this.iteracion++;
 
         return proximoEvento;
     }
@@ -272,18 +282,13 @@ public class VectorEstado {
         return peluquero;
     }
 
-    public Cliente determinarClienteRecienAtendido(Peluquero peluquero) {
-        return clientes.stream()
-                .filter(c -> c.getPeluquero().getId() == peluquero.getId() && c.getEstado() == EstadoCliente.SIENDO_ATENDIDO)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public Cliente determinarProximoClienteEnCola(Peluquero peluquero) {
-        return clientes.stream()
-                .filter(c -> c.getPeluquero().getId() == peluquero.getId() && c.getEstado() == EstadoCliente.ESPERANDO_ATENCION)
-                .findFirst()
-                .orElse(null);
+    public Cliente buscarCliente(Peluquero peluquero, EstadoCliente estado) {
+        for (Cliente cliente : clientes) {
+            if (cliente.getPeluquero().getId() == peluquero.getId() && cliente.getEstado() == estado) {
+                return cliente;
+            }
+        }
+        return null;
     }
 
     public void actualizarStringEvento(String stringEvento) {

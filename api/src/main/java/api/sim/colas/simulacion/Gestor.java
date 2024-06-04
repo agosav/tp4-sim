@@ -2,6 +2,7 @@ package api.sim.colas.simulacion;
 
 import api.sim.colas.dtos.IdPeluqueroDto;
 import api.sim.colas.dtos.ParametrosDto;
+import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
@@ -114,16 +115,10 @@ public class Gestor {
         vectorProximo.duplicarVector(vectorAnterior, evento, tiempoLlegadaMin, tiempoLlegadaMax);
 
         // Acá llamamos un método distinto según el evento que corresponda a la fila actual
-        if (evento == Evento.LLEGADA_CLIENTE) {
-            receptarCliente(vectorProximo);
-        }
-
-        if (evento == Evento.FIN_ATENCION) {
-            finalizarAtencion(vectorProximo);
-        }
-
-        if (evento == Evento.INICIALIZACION) {
-            iniciarNuevoDia(vectorProximo);
+        switch (evento) {
+            case LLEGADA_CLIENTE -> receptarCliente(vectorProximo);
+            case FIN_ATENCION -> finalizarAtencion(vectorProximo);
+            case INICIALIZACION -> iniciarNuevoDia(vectorProximo);
         }
 
         vectorProximo.actualizarVariablesEstadisticas();
@@ -190,7 +185,7 @@ public class Gestor {
     private void finalizarAtencion(VectorEstado vector) {
         // Buscamos al peluquero y al cliente involucrados en este fin de atención
         Peluquero peluquero = vector.determinarQuePeluqueroFinalizoAtencion();
-        Cliente cliente = vector.determinarClienteRecienAtendido(peluquero);
+        Cliente cliente = vector.buscarCliente(peluquero, EstadoCliente.SIENDO_ATENDIDO);
         vector.actualizarStringEvento("Fin atención del cliente " + cliente.getId() + " (" + peluquero.getNombre() + ")");
 
         /*
@@ -202,7 +197,7 @@ public class Gestor {
         // Si el peluquero tiene cola: ponemos en estado Siendo Atendido al próximo cliente
         Float finAtencion = null;
         if (peluquero.tieneCola()) {
-            Cliente siguienteCliente = vector.determinarProximoClienteEnCola(peluquero);
+            Cliente siguienteCliente = vector.buscarCliente(peluquero, EstadoCliente.ESPERANDO_ATENCION);
             finAtencion = vector.determinarFinAtencion(peluquero);
             siguienteCliente.serAtendido();
             vector.actualizarAcumulador(siguienteCliente);

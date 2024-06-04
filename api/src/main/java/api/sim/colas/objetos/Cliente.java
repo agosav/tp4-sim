@@ -14,18 +14,26 @@ public class Cliente implements Cloneable {
     @Builder.Default
     private EstadoCliente estado = EstadoCliente.INICIALIZADO;
 
-    private float llegada;
+    private float tiempoLlegada;
+
+    private Float tiempoAtencion;
 
     private Float acumuladorTiempoEspera;
 
     private IdPeluqueroDto peluquero;
 
-    public void serAtendido() {
+    public void serAtendido(float reloj) {
         this.estado = EstadoCliente.SIENDO_ATENDIDO;
+        this.tiempoAtencion = reloj;
+        this.acumuladorTiempoEspera = Math.max(reloj - tiempoLlegada, 0);
     }
 
     public void esperar() {
         this.estado = EstadoCliente.ESPERANDO_ATENCION;
+    }
+
+    public void actualizarAcumulador(float reloj) {
+        this.acumuladorTiempoEspera = reloj - tiempoLlegada;
     }
 
     @Override

@@ -1,10 +1,7 @@
 package api.sim.colas.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -56,28 +53,37 @@ public class ParametrosDto {
 
     @PositiveOrZero
     @NotNull
-    @JsonProperty("tiempo-atencion_max_aprendiz")
+    @JsonProperty("tiempo_atencion_max_aprendiz")
     private float tiempoAtencionMaxAprendiz;
 
     @PositiveOrZero
     @NotNull
-    @JsonProperty("tiempo-atencion_max_veterano_a")
+    @JsonProperty("tiempo_atencion_max_veterano_a")
     private float tiempoAtencionMaxVeteranoA;
 
     @PositiveOrZero
     @NotNull
-    @JsonProperty("tiempo-atencion_max_veterano_b")
+    @JsonProperty("tiempo_atencion_max_veterano_b")
     private float tiempoAtencionMaxVeteranoB;
 
     @NotNull
-    @Positive
-    private int n;
+    @Min(1)
+    @JsonProperty("cantidad_dias")
+    private int cantidadDias;
 
     @NotNull
     @PositiveOrZero
-    private int i;
+    @JsonProperty("cantidad_iteraciones")
+    private int cantidadIteraciones;
 
-    @Positive
+    @Min(1)
     @NotNull
-    private int j;
+    @JsonProperty("hora_desde")
+    private int horaDesde;
+
+    @Min(1)
+    @NotNull
+    @JsonProperty("dia_desde")
+    private int diaDesde;
+
 }

@@ -54,4 +54,13 @@ public class Auxiliar {
         return acumuladas;
     }
 
+    public static void validarParametrosDistribuciones(ParametrosDto dto) {
+        if (DistribucionUniforme.esValido(dto.getTiempoLlegadaMin(), dto.getTiempoLlegadaMax()) ||
+                DistribucionUniforme.esValido(dto.getTiempoAtencionMinAprendiz(), dto.getTiempoAtencionMaxAprendiz()) ||
+                DistribucionUniforme.esValido(dto.getTiempoAtencionMinVeteranoA(), dto.getTiempoAtencionMaxVeteranoA()) ||
+                DistribucionUniforme.esValido(dto.getTiempoAtencionMinVeteranoB(), dto.getTiempoAtencionMaxVeteranoB())) {
+            throw new IllegalArgumentException("Los parámetros para las distribuciones son inválidos");
+        }
+    }
+
 }

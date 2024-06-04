@@ -4,18 +4,15 @@ import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
-import api.sim.colas.utils.Distribucion;
-import lombok.*;
-
+import api.sim.colas.utils.DistribucionUniforme;
+import lombok.Builder;
+import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
+@Getter
 public class VectorEstado {
 
     // Número de iteración
@@ -28,18 +25,14 @@ public class VectorEstado {
     // Acumulador de todos las minutos de la simulacion
     private float relojTotal;
 
-    // Acumulador de todas las horas de la simulacion
-    @Builder.Default
-    private int horaTotal = 1;
-
     // Reloj en minutos del día actual
     private float relojDia;
 
-    // Hora del día
+    // Reloj en horas del día actual
     // Si el relojDia está entre 0 y 59, la hora es 1.
     // Si el relojDia está entre 60 y 119, la hora es 2. Etc
     @Builder.Default
-    private int horaDia = 1;
+    private int hora = 1;
 
     // Contador de días simulados en toda la simulación
     @Builder.Default
@@ -63,9 +56,9 @@ public class VectorEstado {
     private List<Peluquero> peluqueros = new ArrayList<>();
 
     // Variables estadísticas
-    private float acumuladorCostos;
-    private float acumuladorGanancias;
-    private float promedioRecaudacionDiaria;
+    private double acumuladorCostos;
+    private double acumuladorGanancias;
+    private double promedioRecaudacionDiaria;
     private int sillasNecesarias;
 
     // Lista con los clientes
@@ -79,7 +72,7 @@ public class VectorEstado {
     public float calcularProximaLlegada(float a, float b) {
         float random = (float) Math.random();
 
-        float tiempoEntreLlegadas = Distribucion.uniforme(random, a, b);
+        float tiempoEntreLlegadas = DistribucionUniforme.generar(random, a, b);
 
         this.random1 = random;
         this.tiempoEntreLlegadas = tiempoEntreLlegadas;
@@ -110,7 +103,7 @@ public class VectorEstado {
         float a = peluquero.getTiempoAtencionMin();
         float b = peluquero.getTiempoAtencionMax();
 
-        float tiempoAtencion = Distribucion.uniforme(random, a, b);
+        float tiempoAtencion = DistribucionUniforme.generar(random, a, b);
         float finAtencion = relojDia + tiempoAtencion;
 
         this.random3 = random;
@@ -135,13 +128,15 @@ public class VectorEstado {
      * @return EVENTO de la fila actual
      */
     public Evento determinarEvento(VectorEstado vectorAnterior) {
-        this.dia = vectorAnterior.getDia();
-        this.iteracion = vectorAnterior.getIteracion();
-
         float proximoReloj;
         Evento proximoEvento;
 
+        this.dia = vectorAnterior.getDia();
+        this.iteracion = vectorAnterior.getIteracion();
+
         Float proximaLlegada = vectorAnterior.getProximaLlegada();
+
+        // For para buscar el fin de atención más chico
         float finAtencionMin = Float.MAX_VALUE;
         for (Peluquero p : vectorAnterior.getPeluqueros()) {
             Float finAtencion = p.getFinAtencion();
@@ -150,35 +145,43 @@ public class VectorEstado {
             }
         }
 
+        // Si proximaLlegada no es null, es porque ya pasaron 8 horas y ya no recibimos más clientes
         if (proximaLlegada != null) {
-            if (proximaLlegada < finAtencionMin && horaDia <= 8) {
+
+            // Recibir cliente
+            if (proximaLlegada < finAtencionMin && hora <= 8) {
                 proximoReloj = proximaLlegada;
                 proximoEvento = Evento.LLEGADA_CLIENTE;
+
+            // Finalizar atención
             } else {
                 proximoReloj = finAtencionMin;
                 proximoEvento = Evento.FIN_ATENCION;
             }
+
+        // Si proximaLlegada es null, vamos a finalizar atenciones hasta que la lista de clientes esté vacía
         } else {
+
+            // Finalizar atención
             if (!vectorAnterior.getClientes().isEmpty()) {
                 proximoReloj = finAtencionMin;
                 proximoEvento = Evento.FIN_ATENCION;
+
+            // Iniciar un nuevo día
             } else {
                 proximoReloj = 0;
                 proximoEvento = Evento.INICIALIZACION;
             }
         }
 
+        // Setear relojes
+        this.iteracion++;
+        this.relojDia = proximoReloj;
+        this.relojTotal = Math.max(relojDia - vectorAnterior.getRelojDia(), 0) + vectorAnterior.getRelojTotal();
+        this.hora = (int) Math.ceil(relojDia / 60);
         if (proximoReloj == 0) {
             this.dia = vectorAnterior.getDia() + 1;
         }
-
-        this.relojDia = proximoReloj;
-        this.relojTotal = Math.max(relojDia - vectorAnterior.getRelojDia(), 0) + vectorAnterior.getRelojTotal();
-
-        this.horaDia = (int) Math.ceil(relojDia / 60);
-        this.horaTotal = Math.max(horaDia - vectorAnterior.getHoraDia(), 0) + vectorAnterior.getHoraTotal();
-
-        this.iteracion++;
 
         return proximoEvento;
     }
@@ -220,7 +223,7 @@ public class VectorEstado {
 
         if (evento == Evento.INICIALIZACION) {
             float random = (float) Math.random();
-            float tiempoEntreLlegadas = Distribucion.uniforme(random, tiempoLlegadaMin, tiempoLlegadaMax);
+            float tiempoEntreLlegadas = DistribucionUniforme.generar(random, tiempoLlegadaMin, tiempoLlegadaMax);
             this.random1 = random;
             this.tiempoEntreLlegadas = tiempoEntreLlegadas;
             this.proximaLlegada = tiempoEntreLlegadas;
@@ -238,6 +241,11 @@ public class VectorEstado {
         for (Cliente c : clientes) {
             if (c.getEstado() == EstadoCliente.ESPERANDO_ATENCION) {
                 actualizarAcumulador(c);
+                actualizarCliente(c);
+
+                if (c.getAcumuladorTiempoEspera() >= 30) {
+                    this.acumuladorCostos += 1500;
+                }
             }
         }
 
@@ -245,21 +253,6 @@ public class VectorEstado {
         this.sillasNecesarias = Math.max(sillasNecesarias, peluqueros.stream().mapToInt(Peluquero::getCola).sum());
 
         this.promedioRecaudacionDiaria = (acumuladorGanancias - acumuladorCostos) / dia;
-    }
-
-    /**
-     * Este método actualiza el acumulador de tiempo de espera de UN cliente concreto que estaba esperando.
-     *
-     * @param cliente: cliente a actualizar
-     */
-    public void actualizarAcumulador(Cliente cliente) {
-        float acumulador = relojDia - cliente.getLlegada();
-        cliente.setAcumuladorTiempoEspera(acumulador);
-        actualizarCliente(cliente);
-
-        if (acumulador >= 30) {
-            this.acumuladorCostos += 1500;
-        }
     }
 
     // ------------------------------------------------------------------------------------
@@ -328,10 +321,19 @@ public class VectorEstado {
         this.clientes = listaActualizada;
     }
 
+    public void actualizarAcumulador(Cliente cliente) {
+        cliente.actualizarAcumulador(relojDia);
+
+        if (cliente.getAcumuladorTiempoEspera() >= 30) {
+            this.acumuladorCostos += 1500;
+        }
+    }
+
     public void cobrarAtencion(Peluquero peluquero) {
         this.acumuladorGanancias += peluquero.getTarifa();
     }
 
+    // Cortamos la simulación cuando terminó el día n o cuando llegamos a 100 mil iteraciones
     public boolean esLaUltimaFila(int n, int contador) {
         return proximaLlegada == null && clientes.isEmpty() && dia == n - 1 || contador == 100000;
     }

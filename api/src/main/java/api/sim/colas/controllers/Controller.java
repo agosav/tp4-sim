@@ -10,9 +10,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 @RequestMapping("/colas")
 @RequiredArgsConstructor
@@ -24,11 +21,11 @@ public class Controller {
     @PostMapping("/simular")
     public ResponseEntity<?> simular(@Valid @RequestBody ParametrosDto parametros, BindingResult result) {
         if (result.hasErrors()) {
-            List<String> errores = new ArrayList<>();
+            StringBuilder errores = new StringBuilder();
             for (FieldError error : result.getFieldErrors()) {
-                errores.add(error.getField() + " " + error.getDefaultMessage());
+                errores.append(error.getField()).append(" ").append(error.getDefaultMessage()).append(". ");
             }
-            return new ResponseEntity<>(errores, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(String.valueOf(errores), HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -37,4 +34,5 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
 }

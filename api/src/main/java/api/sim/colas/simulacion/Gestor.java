@@ -7,9 +7,8 @@ import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
 import api.sim.colas.utils.Auxiliar;
-import api.sim.colas.utils.Distribucion;
+import api.sim.colas.utils.DistribucionUniforme;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,20 +41,22 @@ public class Gestor {
         VectorEstado vectorEstado = inicializar(dto);
         List<VectorEstado> tabla = new ArrayList<>();
 
-        int n = dto.getN() + 1;  // Cantidad de días a simular en total
-        int i = dto.getI();  // Cantidad de iteraciones a mostrar
-        int j = dto.getJ();  // Hora de la primera iteración a mostrar
+        int cantidadDias = dto.getCantidadDias() + 1;  // Cantidad de días a simular en total
+        int cantidadIteraciones = dto.getCantidadIteraciones();  // Cantidad de iteraciones a mostrar
+        int diaDesde = dto.getDiaDesde();
+        int horaDesde = dto.getHoraDesde();
         int contador = 0;  // Contador de iteraciones
 
         // Simulación
         while (true) {
-            int hora = vectorEstado.getHoraTotal();
-            boolean esLaUltimaFila = vectorEstado.esLaUltimaFila(n, contador);
+            int dia = vectorEstado.getDia();
+            int hora = vectorEstado.getHora();
+            boolean esLaUltimaFila = vectorEstado.esLaUltimaFila(cantidadDias, contador);
 
             // Agregar vector a la tabla que se va a mostrar
-            if (j <= hora && i >= 0 || esLaUltimaFila) {
+            if (diaDesde <= dia && horaDesde <= hora && cantidadIteraciones >= 0 || esLaUltimaFila) {
                 tabla.add(vectorEstado);
-                i--;
+                cantidadIteraciones--;
 
                 if (esLaUltimaFila) {
                     break;
@@ -77,13 +78,7 @@ public class Gestor {
      * @return primer vector estado de toda la simulación
      */
     private VectorEstado inicializar(ParametrosDto dto) {
-        if (dto.getTiempoLlegadaMax() <= dto.getTiempoLlegadaMin() ||
-                dto.getTiempoAtencionMaxAprendiz() <= dto.getTiempoAtencionMinAprendiz() ||
-                dto.getTiempoAtencionMaxVeteranoA() <= dto.getTiempoAtencionMinVeteranoA() ||
-                dto.getTiempoAtencionMaxVeteranoB() <= dto.getTiempoAtencionMinVeteranoB()
-        ) {
-            throw new IllegalArgumentException("Al menos un parámetro de las distribuciones es inválido");
-        }
+        Auxiliar.validarParametrosDistribuciones(dto);
 
         this.nextIdCliente = 0;
         this.tiempoLlegadaMin = dto.getTiempoLlegadaMin();
@@ -91,7 +86,7 @@ public class Gestor {
         this.probabilidadesAtencion = Auxiliar.calcularProbabilidadesAcumuladas(dto);
 
         float random = (float) Math.random();
-        float tiempoEntreLlegadas = Distribucion.uniforme(random, tiempoLlegadaMin, tiempoLlegadaMax);
+        float tiempoEntreLlegadas = DistribucionUniforme.generar(random, tiempoLlegadaMin, tiempoLlegadaMax);
 
         return VectorEstado.builder()
                 .peluqueros(Auxiliar.inicializarPeluqueros(dto))
@@ -138,7 +133,7 @@ public class Gestor {
     private void receptarCliente(VectorEstado vector) {
         // Creamos el nuevo objeto cliente
         this.nextIdCliente++;
-        Cliente cliente = Cliente.builder().id(nextIdCliente).llegada(vector.getRelojDia()).build();
+        Cliente cliente = Cliente.builder().id(nextIdCliente).tiempoLlegada(vector.getRelojDia()).build();
         vector.actualizarStringEvento("Llegada del cliente " + cliente.getId());
 
         // Calculamos la próxima llegada de un cliente
@@ -169,7 +164,7 @@ public class Gestor {
         } else {
             finAtencion = vector.determinarFinAtencion(peluquero);
             peluquero.atender();
-            cliente.serAtendido();
+            cliente.serAtendido(vector.getRelojDia());
         }
 
         // Actualizamos vector estado
@@ -194,12 +189,11 @@ public class Gestor {
             - Buscamos al primer cliente en la cola y lo ponemos en estado SIENDO_ATENDIDO
             - Calculamos el tiempo de fin de atención
          */
-        // Si el peluquero tiene cola: ponemos en estado Siendo Atendido al próximo cliente
         Float finAtencion = null;
         if (peluquero.tieneCola()) {
             Cliente siguienteCliente = vector.buscarCliente(peluquero, EstadoCliente.ESPERANDO_ATENCION);
             finAtencion = vector.determinarFinAtencion(peluquero);
-            siguienteCliente.serAtendido();
+            siguienteCliente.serAtendido(vector.getRelojDia());
             vector.actualizarAcumulador(siguienteCliente);
             vector.actualizarCliente(siguienteCliente);
         }
@@ -222,4 +216,5 @@ public class Gestor {
         int diaActual = vector.getDia();
         vector.actualizarStringEvento("Inicialización del día " + diaActual);
     }
+
 }

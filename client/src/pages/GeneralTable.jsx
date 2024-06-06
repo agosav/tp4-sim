@@ -30,6 +30,12 @@ const GeneralTable = ({ tabla }) => {
     financialInfo: { backgroundColor: "#ffccff" },
   };
 
+  const round = (num, decimales) => {
+    if (num === null) return null;
+    if (num === 0) return 0;
+    return parseFloat(num).toFixed(decimales);
+  };
+
   return (
     <>
       <Table responsive striped bordered hover className="table-auto-width">
@@ -78,17 +84,17 @@ const GeneralTable = ({ tabla }) => {
             <tr key={`body-${index}`}>
               <td>{fila.iteracion}</td>
               <td style={estilos.eventInfo}>{fila.evento}</td>
-              <td style={estilos.eventInfo}>{fila.relojTotal}</td>
-              <td style={estilos.eventInfo}>{fila.relojDia}</td>
+              <td style={estilos.eventInfo}>{round(fila.relojTotal, 4)}</td>
+              <td style={estilos.eventInfo}>{round(fila.relojDia, 4)}</td>
               <td style={estilos.eventInfo}>{fila.hora}</td>
               <td style={estilos.eventInfo}>{fila.dia}</td>
-              <td style={estilos.randomArrival}>{fila.random1}</td>
-              <td style={estilos.randomArrival}>{fila.tiempoEntreLlegadas}</td>
-              <td style={estilos.randomArrival}>{fila.proximaLlegada}</td>
-              <td style={estilos.randomAttendant}>{fila.random2}</td>
+              <td style={estilos.randomArrival}>{round(fila.random1, 4)}</td>
+              <td style={estilos.randomArrival}>{round(fila.tiempoEntreLlegadas, 4)}</td>
+              <td style={estilos.randomArrival}>{round(fila.proximaLlegada, 4)}</td>
+              <td style={estilos.randomAttendant}>{round(fila.random2, 4)}</td>
               <td style={estilos.randomAttendant}>{fila.nombreQuienAtiende}</td>
-              <td style={estilos.randomTime}>{fila.random3}</td>
-              <td style={estilos.randomTime}>{fila.tiempoAtencion}</td>
+              <td style={estilos.randomTime}>{round(fila.random3, 4)}</td>
+              <td style={estilos.randomTime}>{round(fila.tiempoAtencion, 4)}</td>
 
               <td style={estilos.peluquero1Info}>
                 {fila.peluqueros[0].nombre}
@@ -98,7 +104,7 @@ const GeneralTable = ({ tabla }) => {
               </td>
               <td style={estilos.peluquero1Info}>{fila.peluqueros[0].cola}</td>
               <td style={estilos.peluquero1Info}>
-                {fila.peluqueros[0].finAtencion}
+                {round(fila.peluqueros[0].finAtencion, 4)}
               </td>
 
               <td style={estilos.peluquero2Info}>
@@ -109,7 +115,7 @@ const GeneralTable = ({ tabla }) => {
               </td>
               <td style={estilos.peluquero2Info}>{fila.peluqueros[1].cola}</td>
               <td style={estilos.peluquero2Info}>
-                {fila.peluqueros[1].finAtencion}
+                {round(fila.peluqueros[1].finAtencion, 4)}
               </td>
 
               <td style={estilos.peluquero3Info}>
@@ -120,13 +126,13 @@ const GeneralTable = ({ tabla }) => {
               </td>
               <td style={estilos.peluquero3Info}>{fila.peluqueros[2].cola}</td>
               <td style={estilos.peluquero3Info}>
-                {fila.peluqueros[2].finAtencion}
+                {round(fila.peluqueros[2].finAtencion, 4)}
               </td>
 
               <td style={estilos.financialInfo}>{fila.acumuladorCostos}</td>
               <td style={estilos.financialInfo}>{fila.acumuladorGanancias}</td>
               <td style={estilos.financialInfo}>
-                {fila.promedioRecaudacionDiaria}
+                {round(fila.promedioRecaudacionDiaria, 2)}
               </td>
               <td style={estilos.financialInfo}>{fila.sillasNecesarias}</td>
 

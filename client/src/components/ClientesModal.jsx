@@ -2,6 +2,11 @@
 import React from "react";
 import { Modal, Table, Button } from "react-bootstrap";
 
+const round = (num, decimales) => {
+    if (num === 0) return 0;
+    return parseFloat(num).toFixed(decimales);
+}
+
 const ClientesModal = ({ show, handleClose, clientes }) => {
   return (
     <Modal show={show} onHide={handleClose} size="lg">
@@ -24,7 +29,7 @@ const ClientesModal = ({ show, handleClose, clientes }) => {
                 <tr key={cliente.id}>
                   <td>{cliente.id}</td>
                   <td>{cliente.estado}</td>
-                  <td>{cliente.acumuladorTiempoEspera}</td>
+                  <td>{round(cliente.acumuladorTiempoEspera, 4)}</td>
                   <td>{cliente.peluquero.nombre}</td>
                 </tr>
               ))}

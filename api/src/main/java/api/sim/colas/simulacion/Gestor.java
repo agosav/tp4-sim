@@ -54,7 +54,7 @@ public class Gestor {
             boolean esLaUltimaFila = vectorEstado.esLaUltimaFila(cantidadDias, contador);
 
             // Agregar vector a la tabla que se va a mostrar
-            if (diaDesde <= dia && horaDesde <= hora && cantidadIteraciones >= 0 || esLaUltimaFila) {
+            if (diaDesde * 8 + horaDesde <= dia * 8 + hora && cantidadIteraciones >= 0 || esLaUltimaFila) {
                 tabla.add(vectorEstado);
                 cantidadIteraciones--;
 

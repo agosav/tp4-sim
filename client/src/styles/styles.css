@@ -1,0 +1,4 @@
+.table-auto-width tbody td {
+    white-space: nowrap;
+    width: auto;
+}

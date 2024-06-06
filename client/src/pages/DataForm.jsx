@@ -13,6 +13,7 @@ const DataForm = ({ setRespuestas }) => {
     reset,
     setValue,
     control,
+    watch
   } = useForm({
     defaultValues: {
       porcentaje_aprendiz: 15.0,
@@ -34,6 +35,20 @@ const DataForm = ({ setRespuestas }) => {
   });
 
   const navigate = useNavigate();
+
+  const tiempoAtencionMinAprendiz = parseFloat(watch("tiempo_atencion_min_aprendiz"));
+  const tiempoAtencionMaxAprendiz = parseFloat(watch("tiempo_atencion_max_aprendiz"));
+  const tiempoAtencionMinVeteranoA = parseFloat(watch("tiempo_atencion_min_veterano_a"));
+  const tiempoAtencionMaxVeteranoA = parseFloat(watch("tiempo_atencion_max_veterano_a"));
+  const tiempoAtencionMinVeteranoB = parseFloat(watch("tiempo_atencion_min_veterano_b"));
+  const tiempoAtencionMaxVeteranoB = parseFloat(watch("tiempo_atencion_max_veterano_b"));
+  const tiempoLlegadaMin = parseFloat(watch("tiempo_llegada_min"));
+  const tiempoLlegadaMax = parseFloat(watch("tiempo_llegada_max"));
+  const cantidadDias = parseInt(watch("cantidad_dias"));
+  const diaDesde = parseInt(watch("dia_desde"));
+  const porcentajeAprendiz = parseFloat(watch("porcentaje_aprendiz"));
+  const porcentajeVeteranoA = parseFloat(watch("porcentaje_veterano_a"));
+  const porcentajeVeteranoB = parseFloat(watch("porcentaje_veterano_b"));
 
   const [errorAPI, setErrorApi] = useState("");
 
@@ -152,10 +167,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_atencion_min_aprendiz"
                   control={control}
                   rules={{
-                    value: {
-                      value: 20,
-                      message: "El tiempo mínimo debe ser 20 minutos",
+                    min: {
+                      value: 0,
+                      message: "Debe ser igual o mayor a 0",
                     },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -165,7 +184,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -200,10 +219,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_atencion_max_aprendiz"
                   control={control}
                   rules={{
-                    value: {
-                      value: 30,
-                      message: "El tiempo máximo debe ser 30 minutos",
-                    },
+                      min: {
+                          value: 0,
+                          message: "Debe ser igual o mayor a 0",
+                      },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -213,7 +236,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -231,7 +254,19 @@ const DataForm = ({ setRespuestas }) => {
                 </span>
               )}
             </Form.Group>
+              {tiempoAtencionMaxAprendiz <= tiempoAtencionMinAprendiz && (
+                  <span
+                      style={{
+                          marginLeft: "140px",
+                          color: "red",
+                          fontWeight: "600",
+                      }}
+                  >
+                      {"El mínimo debe ser menor al máximo."}
+                  </span>
+              )}
           </Col>
+
 
           <Col>
             <h4 className="text-center">Veterano A</h4>
@@ -299,10 +334,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_atencion_min_veterano_a"
                   control={control}
                   rules={{
-                    value: {
-                      value: 11,
-                      message: "El tiempo mínimo debe ser 11 minutos",
-                    },
+                      min: {
+                          value: 0,
+                          message: "Debe ser igual o mayor a 0",
+                      },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -312,7 +351,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -347,10 +386,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_atencion_max_veterano_a"
                   control={control}
                   rules={{
-                    value: {
-                      value: 13,
-                      message: "El tiempo máximo debe ser 13 minutos",
-                    },
+                      min: {
+                          value: 0,
+                          message: "Debe ser igual o mayor a 0",
+                      },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -360,7 +403,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -378,6 +421,17 @@ const DataForm = ({ setRespuestas }) => {
                 </span>
               )}
             </Form.Group>
+              {tiempoAtencionMaxVeteranoA <= tiempoAtencionMinVeteranoA && (
+                  <span
+                      style={{
+                          marginLeft: "140px",
+                          color: "red",
+                          fontWeight: "600",
+                      }}
+                  >
+                      {"El mínimo debe ser menor al máximo."}
+                  </span>
+              )}
           </Col>
 
           <Col>
@@ -446,10 +500,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_atencion_min_veterano_b"
                   control={control}
                   rules={{
-                    value: {
-                      value: 12,
-                      message: "El tiempo mínimo debe ser 12 minutos",
-                    },
+                      min: {
+                          value: 0,
+                          message: "Debe ser igual o mayor a 0",
+                      },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -459,7 +517,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -494,10 +552,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_atencion_max_veterano_b"
                   control={control}
                   rules={{
-                    value: {
-                      value: 18,
-                      message: "El tiempo máximo debe ser 18 minutos",
-                    },
+                      min: {
+                          value: 0,
+                          message: "Debe ser igual o mayor a 0",
+                      },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -507,7 +569,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -525,8 +587,29 @@ const DataForm = ({ setRespuestas }) => {
                 </span>
               )}
             </Form.Group>
+              {tiempoAtencionMaxVeteranoB <= tiempoAtencionMinVeteranoB && (
+                  <span
+                      style={{
+                          marginLeft: "140px",
+                          color: "red",
+                          fontWeight: "600",
+                      }}
+                  >
+                      {"El mínimo debe ser menor al máximo."}
+                  </span>
+              )}
           </Col>
         </Row>
+          {porcentajeAprendiz + porcentajeVeteranoA + porcentajeVeteranoB < 100 && (
+              <span
+                  style={{
+                      color: "red",
+                      fontWeight: "600",
+                  }}
+              >
+                      {"La suma de las probabilidades no da 100%."}
+                  </span>
+          )}
 
         <hr />
         <h3>Clientes</h3>
@@ -548,10 +631,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_llegada_min"
                   control={control}
                   rules={{
-                    value: {
-                      value: 2,
-                      message: "La demora mínima debe ser 2 minutos",
-                    },
+                      min: {
+                          value: 0,
+                          message: "Debe ser igual o mayor a 0",
+                      },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -561,7 +648,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -597,10 +684,14 @@ const DataForm = ({ setRespuestas }) => {
                   name="tiempo_llegada_max"
                   control={control}
                   rules={{
-                    value: {
-                      value: 12,
-                      message: "La demora máxima debe ser 12 minutos",
-                    },
+                      min: {
+                          value: 0,
+                          message: "Debe ser igual o mayor a 0",
+                      },
+                      max: {
+                          value: 480,
+                          message: "Debe ser igual o menor a 480"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
@@ -610,7 +701,7 @@ const DataForm = ({ setRespuestas }) => {
                     <Form.Control
                       type="number"
                       {...field}
-                      placeholder="%"
+                      placeholder="Minutos"
                       step="0.1"
                     />
                   )}
@@ -629,6 +720,17 @@ const DataForm = ({ setRespuestas }) => {
               )}
             </Form.Group>
           </Col>
+            {tiempoLlegadaMax <= tiempoLlegadaMin && (
+                <span
+                    style={{
+                        marginLeft: "140px",
+                        color: "red",
+                        fontWeight: "600",
+                    }}
+                >
+                      {"El mínimo debe ser menor al máximo."}
+                  </span>
+            )}
         </Row>
 
         <hr />
@@ -651,17 +753,21 @@ const DataForm = ({ setRespuestas }) => {
                   name="cantidad_dias"
                   control={control}
                   rules={{
-                    max: {
-                      value: 100000,
-                      message: "El valor máximo es 100000",
-                    },
+                      min: {
+                          value: 1,
+                          message: "El valor mínimo es 1"
+                      },
+                      pattern: {
+                          value: /^[0-9]+$/,
+                          message: "Ingrese un número entero válido",
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
                   render={({ field }) => (
-                    <Form.Control type="number" {...field} placeholder="%" />
+                    <Form.Control type="number" {...field} placeholder="0" />
                   )}
                 />
               </div>
@@ -696,17 +802,25 @@ const DataForm = ({ setRespuestas }) => {
                   name="hora_desde"
                   control={control}
                   rules={{
+                      min: {
+                          value: 0,
+                          message: "El valor mínimo es 0"
+                      },
                     max: {
                       value: 8,
                       message: "El valor máximo es 8",
                     },
+                      pattern: {
+                          value: /^[0-9]+$/,
+                          message: "Ingrese un número entero válido",
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
                   render={({ field }) => (
-                    <Form.Control type="number" {...field} placeholder="%" />
+                    <Form.Control type="number" {...field} placeholder="0" />
                   )}
                 />
               </div>
@@ -741,13 +855,21 @@ const DataForm = ({ setRespuestas }) => {
                   name="dia_desde"
                   control={control}
                   rules={{
+                      pattern: {
+                          value: /^[0-9]+$/,
+                          message: "Ingrese un número entero válido",
+                      },
+                      min: {
+                          value: 0,
+                          message: "El valor mínimo es 0"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
                   render={({ field }) => (
-                    <Form.Control type="number" {...field} placeholder="%" />
+                    <Form.Control type="number" {...field} placeholder="0" />
                   )}
                 />
               </div>
@@ -763,6 +885,17 @@ const DataForm = ({ setRespuestas }) => {
                 </span>
               )}
             </Form.Group>
+              {diaDesde > cantidadDias && (
+                  <span
+                      style={{
+                          marginLeft: "140px",
+                          color: "red",
+                          fontWeight: "600",
+                      }}
+                  >
+                      {"El valor máximo es " + cantidadDias}
+                  </span>
+              )}
           </Col>
 
           <Col>
@@ -782,17 +915,25 @@ const DataForm = ({ setRespuestas }) => {
                   name="cantidad_iteraciones"
                   control={control}
                   rules={{
+                      pattern: {
+                          value: /^[0-9]+$/,
+                          message: "Ingrese un número entero válido",
+                      },
                     max: {
                       value: 100000,
                       message: "El valor máximo es 100000",
                     },
+                      min: {
+                        value: 0,
+                          message: "El valor mínimo es 0"
+                      },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
                   render={({ field }) => (
-                    <Form.Control type="number" {...field} placeholder="%" />
+                    <Form.Control type="number" {...field} placeholder="0" />
                   )}
                 />
               </div>
@@ -811,19 +952,9 @@ const DataForm = ({ setRespuestas }) => {
           </Col>
         </Row>
 
-        {errorAPI && (
-          <span
-            style={{
-              color: "red",
-              fontWeight: "600",
-            }}
-          >
-            {errorAPI}
-          </span>
-        )}
-
         <div className="align-itms-end">
-          <Button className="btn btn-primary" onClick={handleSubmit(onSubmit)}>
+          <Button className="btn btn-primary" onClick={handleSubmit(onSubmit)}
+          style={{"margin-top": "10px"}}>
             Calcular
           </Button>
         </div>

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button, Table } from "react-bootstrap";
 import ClientesModal from "../components/ClientesModal";
 import { Results } from "../components/Results";
+import "../styles/styles.css"
 
 const GeneralTable = ({ tabla }) => {
   const [modalShow, setModalShow] = useState(false);
@@ -31,9 +32,10 @@ const GeneralTable = ({ tabla }) => {
 
   return (
     <>
-      <Table responsive striped bordered hover>
+      <Table responsive striped bordered hover className="table-auto-width">
         <thead>
           <tr>
+            <th>i</th>
             <th style={estilos.eventInfo}>Evento</th>
             <th style={estilos.eventInfo}>Reloj Total</th>
             <th style={estilos.eventInfo}>Reloj Dia</th>
@@ -74,6 +76,7 @@ const GeneralTable = ({ tabla }) => {
         <tbody>
           {tabla.map((fila, index) => (
             <tr key={`body-${index}`}>
+              <td>{fila.iteracion}</td>
               <td style={estilos.eventInfo}>{fila.evento}</td>
               <td style={estilos.eventInfo}>{fila.relojTotal}</td>
               <td style={estilos.eventInfo}>{fila.relojDia}</td>
@@ -132,7 +135,7 @@ const GeneralTable = ({ tabla }) => {
                   variant="link"
                   onClick={() => handleShow(fila.clientes)}
                 >
-                  VER MAS
+                  VER MÁS
                 </Button>
               </td>
             </tr>

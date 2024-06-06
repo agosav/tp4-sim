@@ -2,6 +2,7 @@ package api.sim.colas.utils;
 
 import api.sim.colas.dtos.ParametrosDto;
 import api.sim.colas.objetos.Peluquero;
+
 import java.util.List;
 
 public class Auxiliar {

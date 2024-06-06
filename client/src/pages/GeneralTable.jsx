@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button, Table } from "react-bootstrap";
 import ClientesModal from "../components/ClientesModal";
 import { Results } from "../components/Results";
-import "../styles/styles.css"
+import "../styles/styles.css";
 
 const GeneralTable = ({ tabla }) => {
   const [modalShow, setModalShow] = useState(false);
@@ -20,14 +20,11 @@ const GeneralTable = ({ tabla }) => {
   };
 
   const estilos = {
-    eventInfo: { backgroundColor: "#ffffcc" },
-    randomArrival: { backgroundColor: "#ccffcc" },
-    randomAttendant: { backgroundColor: "#cce5ff" },
-    randomTime: { backgroundColor: "#e6ccff" },
-    peluquero1Info: { backgroundColor: "#ffccff" },
-    peluquero2Info: { backgroundColor: "#ffcccc" },
-    peluquero3Info: { backgroundColor: "#ffcc99" },
-    financialInfo: { backgroundColor: "#ffccff" },
+    oscuro: { backgroundColor: "#ececec", verticalAlign: "middle"},
+    claro: { backgroundColor: "#ffffff", verticalAlign: "middle"},
+    peluquero1Info: { backgroundColor: "#ffbaba", verticalAlign: "middle"},
+    peluquero2Info: { backgroundColor: "#d3ffba", verticalAlign: "middle"},
+    peluquero3Info: { backgroundColor: "#bacaff", verticalAlign: "middle"},
   };
 
   const round = (num, decimales) => {
@@ -36,116 +33,128 @@ const GeneralTable = ({ tabla }) => {
     return parseFloat(num).toFixed(decimales);
   };
 
+  const getAttendantStyle = (nombreQuienAtiende) => {
+    if (nombreQuienAtiende === "Aprendiz") {
+      return estilos.peluquero1Info;
+    } else if (nombreQuienAtiende === "Veterano A") {
+      return estilos.peluquero2Info;
+    } else if (nombreQuienAtiende === "Veterano B") {
+      return estilos.peluquero3Info;
+    } else {
+      return estilos.oscuro;
+    }
+  };
+
   return (
     <>
       <Table responsive striped bordered hover className="table-auto-width">
         <thead>
-          <tr>
-            <th>i</th>
-            <th style={estilos.eventInfo}>Evento</th>
-            <th style={estilos.eventInfo}>Reloj Total</th>
-            <th style={estilos.eventInfo}>Reloj Dia</th>
-            <th style={estilos.eventInfo}>Hora</th>
-            <th style={estilos.eventInfo}>Dia</th>
-            <th style={estilos.randomArrival}>Random 1</th>
-            <th style={estilos.randomArrival}>Tiempo Entre Llegadas</th>
-            <th style={estilos.randomArrival}>Proxima Llegada</th>
-            <th style={estilos.randomAttendant}>Random 2</th>
-            <th style={estilos.randomAttendant}>Nombre Quien Atiende</th>
-            <th style={estilos.randomTime}>Random 3</th>
-            <th style={estilos.randomTime}>Tiempo Atencion</th>
+        <tr>
 
-            <th style={estilos.peluquero1Info}>Nombre Pel.1</th>
-            <th style={estilos.peluquero1Info}>Estado Pel.1</th>
-            <th style={estilos.peluquero1Info}>Cola Pel.1</th>
-            <th style={estilos.peluquero1Info}>Fin Atención Pel.1</th>
+          <th rowSpan="3" style={estilos.oscuro}>i</th>
+          <th rowSpan="3" style={estilos.claro}>Evento</th>
 
-            <th style={estilos.peluquero2Info}>Nombre Pel.2</th>
-            <th style={estilos.peluquero2Info}>Estado Pel.2</th>
-            <th style={estilos.peluquero2Info}>Cola Pel.2</th>
-            <th style={estilos.peluquero2Info}>Fin Atención Pel.2</th>
+          <th colSpan="4" style={estilos.oscuro}>Relojes</th>
 
-            <th style={estilos.peluquero3Info}>Nombre Pel.3</th>
-            <th style={estilos.peluquero3Info}>Estado Pel.3</th>
-            <th style={estilos.peluquero3Info}>Cola Pel.3</th>
-            <th style={estilos.peluquero3Info}>Fin Atención Pel.3</th>
+          <th colSpan="7" style={estilos.claro}>Variables Aleatorias</th>
 
-            <th style={estilos.financialInfo}>Acumulador Costos</th>
-            <th style={estilos.financialInfo}>Acumulador Ganancias</th>
-            <th style={estilos.financialInfo}>Promedio Recaudacion Diaria</th>
-            <th style={estilos.financialInfo}>Sillas Necesarias</th>
+          <th colSpan="9" style={estilos.oscuro}>Servidores</th>
 
-            <th>Clientes</th>
-          </tr>
+          <th colSpan="4" style={estilos.claro}>Estadísticas</th>
+
+          <th rowSpan="3" style={estilos.oscuro}>Clientes</th>
+
+        </tr>
+        <tr>
+
+          <th rowSpan="2" style={estilos.oscuro}>Reloj Total</th>
+          <th rowSpan="2" style={estilos.oscuro}>Reloj Dia</th>
+          <th rowSpan="2" style={estilos.oscuro}>Hora</th>
+          <th rowSpan="2" style={estilos.oscuro}>Dia</th>
+
+          <th colSpan="3" style={estilos.claro}>Llegada</th>
+
+          <th colSpan="2" style={estilos.oscuro}>Quién atiende</th>
+
+          <th colSpan="2" style={estilos.claro}>Tiempo Atención</th>
+
+          <th colSpan="3" style={estilos.peluquero1Info}>APRENDIZ</th>
+          <th colSpan="3" style={estilos.peluquero2Info}>VETERANO A</th>
+          <th colSpan="3" style={estilos.peluquero3Info}>VETERANO B</th>
+
+          <th rowSpan="3" style={estilos.claro}>Acumulador Costos</th>
+          <th rowSpan="3" style={estilos.claro}>Acumulador Ganancias</th>
+          <th rowSpan="3" style={estilos.claro}>Promedio Recaudacion Diaria</th>
+          <th rowSpan="3" style={estilos.claro}>Sillas Necesarias</th>
+        </tr>
+        <tr>
+
+          <th rowSpan="2" style={estilos.claro}>Random</th>
+          <th rowSpan="2" style={estilos.claro}>Tiempo Entre Llegadas</th>
+          <th rowSpan="2" style={estilos.claro}>Proxima Llegada</th>
+
+          <th rowSpan="2" style={estilos.oscuro}>Random</th>
+          <th rowSpan="2" style={estilos.oscuro}>Nombre</th>
+
+          <th rowSpan="2" style={estilos.claro}>Random</th>
+          <th rowSpan="2" style={estilos.claro}>Tiempo Atención</th>
+
+          <th style={estilos.peluquero1Info}>Estado</th>
+          <th style={estilos.peluquero1Info}>Cola</th>
+          <th style={estilos.peluquero1Info}>Fin Atención</th>
+
+          <th style={estilos.peluquero2Info}>Estado</th>
+          <th style={estilos.peluquero2Info}>Cola</th>
+          <th style={estilos.peluquero2Info}>Fin Atención</th>
+
+          <th style={estilos.peluquero3Info}>Estado</th>
+          <th style={estilos.peluquero3Info}>Cola</th>
+          <th style={estilos.peluquero3Info}>Fin Atención</th>
+
+        </tr>
         </thead>
 
         <tbody>
-          {tabla.map((fila, index) => (
-            <tr key={`body-${index}`}>
-              <td>{fila.iteracion}</td>
-              <td style={estilos.eventInfo}>{fila.evento}</td>
-              <td style={estilos.eventInfo}>{round(fila.relojTotal, 4)}</td>
-              <td style={estilos.eventInfo}>{round(fila.relojDia, 4)}</td>
-              <td style={estilos.eventInfo}>{fila.hora}</td>
-              <td style={estilos.eventInfo}>{fila.dia}</td>
-              <td style={estilos.randomArrival}>{round(fila.random1, 4)}</td>
-              <td style={estilos.randomArrival}>{round(fila.tiempoEntreLlegadas, 4)}</td>
-              <td style={estilos.randomArrival}>{round(fila.proximaLlegada, 4)}</td>
-              <td style={estilos.randomAttendant}>{round(fila.random2, 4)}</td>
-              <td style={estilos.randomAttendant}>{fila.nombreQuienAtiende}</td>
-              <td style={estilos.randomTime}>{round(fila.random3, 4)}</td>
-              <td style={estilos.randomTime}>{round(fila.tiempoAtencion, 4)}</td>
+        {tabla.map((fila, index) => (
+          <tr key={`body-${index}`}>
+            <td style={estilos.oscuro}>{fila.iteracion}</td>
+            <td style={{...estilos.claro, fontWeight: "bold"}}>{fila.evento}</td>
+            <td style={estilos.oscuro}>{round(fila.relojTotal, 4)}</td>
+            <td style={{...estilos.oscuro, fontWeight: "bold"}}>{round(fila.relojDia, 4)}</td>
+            <td style={estilos.oscuro}>{"Hora " + fila.hora}</td>
+            <td style={estilos.oscuro}>{"Día " + fila.dia}</td>
+            <td style={estilos.claro}>{round(fila.random1, 4)}</td>
+            <td style={estilos.claro}>{round(fila.tiempoEntreLlegadas, 4)}</td>
+            <td style={{...estilos.claro, fontWeight: "bold"}}>{round(fila.proximaLlegada, 4)}</td>
+            <td style={estilos.oscuro}>{round(fila.random2, 4)}</td>
+            <td style={getAttendantStyle(fila.nombreQuienAtiende)}>{fila.nombreQuienAtiende}</td>
+            <td style={estilos.claro}>{round(fila.random3, 4)}</td>
+            <td style={estilos.claro}>{round(fila.tiempoAtencion, 4)}</td>
 
-              <td style={estilos.peluquero1Info}>
-                {fila.peluqueros[0].nombre}
-              </td>
-              <td style={estilos.peluquero1Info}>
-                {fila.peluqueros[0].estado}
-              </td>
-              <td style={estilos.peluquero1Info}>{fila.peluqueros[0].cola}</td>
-              <td style={estilos.peluquero1Info}>
-                {round(fila.peluqueros[0].finAtencion, 4)}
-              </td>
+            <td style={estilos.peluquero1Info}>{fila.peluqueros[0].estado}</td>
+            <td style={estilos.peluquero1Info}>{fila.peluqueros[0].cola}</td>
+            <td style={{ ...estilos.peluquero1Info, fontWeight: "bold" }}>{round(fila.peluqueros[0].finAtencion, 4)}</td>
 
-              <td style={estilos.peluquero2Info}>
-                {fila.peluqueros[1].nombre}
-              </td>
-              <td style={estilos.peluquero2Info}>
-                {fila.peluqueros[1].estado}
-              </td>
-              <td style={estilos.peluquero2Info}>{fila.peluqueros[1].cola}</td>
-              <td style={estilos.peluquero2Info}>
-                {round(fila.peluqueros[1].finAtencion, 4)}
-              </td>
+            <td style={estilos.peluquero2Info}>{fila.peluqueros[1].estado}</td>
+            <td style={estilos.peluquero2Info}>{fila.peluqueros[1].cola}</td>
+            <td style={{ ...estilos.peluquero2Info, fontWeight: "bold" }}>{round(fila.peluqueros[1].finAtencion, 4)}</td>
 
-              <td style={estilos.peluquero3Info}>
-                {fila.peluqueros[2].nombre}
-              </td>
-              <td style={estilos.peluquero3Info}>
-                {fila.peluqueros[2].estado}
-              </td>
-              <td style={estilos.peluquero3Info}>{fila.peluqueros[2].cola}</td>
-              <td style={estilos.peluquero3Info}>
-                {round(fila.peluqueros[2].finAtencion, 4)}
-              </td>
+            <td style={estilos.peluquero3Info}>{fila.peluqueros[2].estado}</td>
+            <td style={estilos.peluquero3Info}>{fila.peluqueros[2].cola}</td>
+            <td style={{ ...estilos.peluquero3Info, fontWeight: "bold" }}>{round(fila.peluqueros[2].finAtencion, 4)}</td>
 
-              <td style={estilos.financialInfo}>{fila.acumuladorCostos}</td>
-              <td style={estilos.financialInfo}>{fila.acumuladorGanancias}</td>
-              <td style={estilos.financialInfo}>
-                {round(fila.promedioRecaudacionDiaria, 2)}
-              </td>
-              <td style={estilos.financialInfo}>{fila.sillasNecesarias}</td>
+            <td style={estilos.claro}>{"$" + fila.acumuladorCostos}</td>
+            <td style={estilos.claro}>{"$" + fila.acumuladorGanancias}</td>
+            <td style={estilos.claro}>{"$" + round(fila.promedioRecaudacionDiaria, 2)}</td>
+            <td style={estilos.claro}>{fila.sillasNecesarias + " sillas"}</td>
 
-              <td>
-                <Button
-                  variant="link"
-                  onClick={() => handleShow(fila.clientes)}
-                >
-                  VER MÁS
-                </Button>
-              </td>
-            </tr>
-          ))}
+            <td style={estilos.oscuro}>
+              <Button variant="link" onClick={() => handleShow(fila.clientes)}>
+                VER MÁS
+              </Button>
+            </td>
+          </tr>
+        ))}
         </tbody>
       </Table>
 
@@ -155,11 +164,7 @@ const GeneralTable = ({ tabla }) => {
         cantSillas={tabla[tabla.length - 1].sillasNecesarias}
         prom={tabla[tabla.length - 1].promedioRecaudacionDiaria}
       />
-      <ClientesModal
-        show={modalShow}
-        handleClose={handleClose}
-        clientes={clientes}
-      />
+      <ClientesModal show={modalShow} handleClose={handleClose} clientes={clientes} />
     </>
   );
 };

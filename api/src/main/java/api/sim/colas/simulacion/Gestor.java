@@ -50,7 +50,7 @@ public class Gestor {
         // Simulación
         while (true) {
             int dia = vectorEstado.getDia();
-            int hora = vectorEstado.getHora();
+            int hora = vectorEstado.getHoraActual();
             boolean esLaUltimaFila = vectorEstado.esLaUltimaFila(cantidadDias, contador);
 
             // Agregar vector a la tabla que se va a mostrar
@@ -133,7 +133,7 @@ public class Gestor {
     private void receptarCliente(VectorEstado vector) {
         // Creamos el nuevo objeto cliente
         this.nextIdCliente++;
-        Cliente cliente = Cliente.builder().id(nextIdCliente).tiempoLlegada(vector.getRelojDia()).build();
+        Cliente cliente = Cliente.builder().id(nextIdCliente).tiempoLlegada(vector.getRelojActual()).build();
         vector.actualizarStringEvento("Llegada del cliente " + cliente.getId());
 
         // Calculamos la próxima llegada de un cliente
@@ -164,7 +164,7 @@ public class Gestor {
         } else {
             finAtencion = vector.determinarFinAtencion(peluquero);
             peluquero.atender();
-            cliente.serAtendido(vector.getRelojDia());
+            cliente.serAtendido(vector.getRelojActual());
         }
 
         // Actualizamos vector estado
@@ -193,7 +193,7 @@ public class Gestor {
         if (peluquero.tieneCola()) {
             Cliente siguienteCliente = vector.buscarCliente(peluquero, EstadoCliente.ESPERANDO_ATENCION);
             finAtencion = vector.determinarFinAtencion(peluquero);
-            siguienteCliente.serAtendido(vector.getRelojDia());
+            siguienteCliente.serAtendido(vector.getRelojActual());
             vector.actualizarAcumulador(siguienteCliente);
             vector.actualizarCliente(siguienteCliente);
         }

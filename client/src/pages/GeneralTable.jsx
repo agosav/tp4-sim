@@ -54,7 +54,7 @@ const GeneralTable = ({ tabla }) => {
           <th rowSpan="3" style={estilos.oscuro}>i</th>
           <th rowSpan="3" style={estilos.claro}>Evento</th>
 
-          <th colSpan="4" style={estilos.oscuro}>Relojes</th>
+          <th colSpan="5" style={estilos.oscuro}>Relojes</th>
 
           <th colSpan="7" style={estilos.claro}>Variables Aleatorias</th>
 
@@ -67,10 +67,11 @@ const GeneralTable = ({ tabla }) => {
         </tr>
         <tr>
 
-          <th rowSpan="2" style={estilos.oscuro}>Reloj Total</th>
-          <th rowSpan="2" style={estilos.oscuro}>Reloj Dia</th>
-          <th rowSpan="2" style={estilos.oscuro}>Hora</th>
+          <th rowSpan="2" style={estilos.oscuro}>Reloj Actual</th>
+          <th rowSpan="2" style={estilos.oscuro}>Hora Actual</th>
           <th rowSpan="2" style={estilos.oscuro}>Dia</th>
+          <th rowSpan="2" style={estilos.oscuro}>Reloj Total</th>
+          <th rowSpan="2" style={estilos.oscuro}>Hora Total</th>
 
           <th colSpan="3" style={estilos.claro}>Llegada</th>
 
@@ -119,10 +120,11 @@ const GeneralTable = ({ tabla }) => {
           <tr key={`body-${index}`}>
             <td style={estilos.oscuro}>{fila.iteracion}</td>
             <td style={{...estilos.claro, fontWeight: "bold"}}>{fila.evento}</td>
-            <td style={estilos.oscuro}>{round(fila.relojTotal, 4)}</td>
-            <td style={{...estilos.oscuro, fontWeight: "bold"}}>{round(fila.relojDia, 4)}</td>
-            <td style={estilos.oscuro}>{"Hora " + fila.hora}</td>
+            <td style={{...estilos.oscuro, fontWeight: "bold"}}>{round(fila.relojActual, 4)}</td>
+            <td style={estilos.oscuro}>{fila.horaActual + " hs"}</td>
             <td style={estilos.oscuro}>{"Día " + fila.dia}</td>
+            <td style={estilos.oscuro}>{round(fila.relojTotal, 4)}</td>
+            <td style={estilos.oscuro}>{fila.horaTotal + " hs"}</td>
             <td style={estilos.claro}>{round(fila.random1, 4)}</td>
             <td style={estilos.claro}>{round(fila.tiempoEntreLlegadas, 4)}</td>
             <td style={{...estilos.claro, fontWeight: "bold"}}>{round(fila.proximaLlegada, 4)}</td>
@@ -133,15 +135,15 @@ const GeneralTable = ({ tabla }) => {
 
             <td style={estilos.peluquero1Info}>{fila.peluqueros[0].estado}</td>
             <td style={estilos.peluquero1Info}>{fila.peluqueros[0].cola}</td>
-            <td style={{ ...estilos.peluquero1Info, fontWeight: "bold" }}>{round(fila.peluqueros[0].finAtencion, 4)}</td>
+            <td style={{...estilos.peluquero1Info, fontWeight: "bold"}}>{round(fila.peluqueros[0].finAtencion, 4)}</td>
 
             <td style={estilos.peluquero2Info}>{fila.peluqueros[1].estado}</td>
             <td style={estilos.peluquero2Info}>{fila.peluqueros[1].cola}</td>
-            <td style={{ ...estilos.peluquero2Info, fontWeight: "bold" }}>{round(fila.peluqueros[1].finAtencion, 4)}</td>
+            <td style={{...estilos.peluquero2Info, fontWeight: "bold"}}>{round(fila.peluqueros[1].finAtencion, 4)}</td>
 
             <td style={estilos.peluquero3Info}>{fila.peluqueros[2].estado}</td>
             <td style={estilos.peluquero3Info}>{fila.peluqueros[2].cola}</td>
-            <td style={{ ...estilos.peluquero3Info, fontWeight: "bold" }}>{round(fila.peluqueros[2].finAtencion, 4)}</td>
+            <td style={{...estilos.peluquero3Info, fontWeight: "bold"}}>{round(fila.peluqueros[2].finAtencion, 4)}</td>
 
             <td style={estilos.claro}>{"$" + fila.acumuladorCostos}</td>
             <td style={estilos.claro}>{"$" + fila.acumuladorGanancias}</td>
@@ -158,8 +160,8 @@ const GeneralTable = ({ tabla }) => {
         </tbody>
       </Table>
 
-      <br />
-      <br />
+      <br/>
+      <br/>
       <Results
         cantSillas={tabla[tabla.length - 1].sillasNecesarias}
         prom={tabla[tabla.length - 1].promedioRecaudacionDiaria}

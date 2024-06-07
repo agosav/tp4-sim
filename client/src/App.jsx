@@ -9,7 +9,6 @@ import { DataForm } from "./pages/DataForm";
 import { useState } from "react";
 import "./App.css";
 import { GeneralTable } from "./pages/GeneralTable";
-import { example } from "./constants/constants";
 
 function App() {
   const [respuestas, setRespuestas] = useState();

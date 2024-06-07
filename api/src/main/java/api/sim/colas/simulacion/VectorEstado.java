@@ -25,14 +25,17 @@ public class VectorEstado {
     // Acumulador de todos las minutos de la simulacion
     private float relojTotal;
 
+    // Acumulador de todas las horas de la simulación
+    private int horaTotal;
+
     // Reloj en minutos del día actual
-    private float relojDia;
+    private float relojActual;
 
     // Reloj en horas del día actual
     // Si el relojDia está entre 0 y 59, la hora es 1.
     // Si el relojDia está entre 60 y 119, la hora es 2. Etc
     @Builder.Default
-    private int hora = 1;
+    private int horaActual = 1;
 
     // Contador de días simulados en toda la simulación
     @Builder.Default
@@ -76,7 +79,7 @@ public class VectorEstado {
 
         this.random1 = random;
         this.tiempoEntreLlegadas = tiempoEntreLlegadas;
-        this.proximaLlegada = relojDia + tiempoEntreLlegadas;
+        this.proximaLlegada = relojActual + tiempoEntreLlegadas;
 
         return proximaLlegada;
     }
@@ -104,7 +107,7 @@ public class VectorEstado {
         float b = peluquero.getTiempoAtencionMax();
 
         float tiempoAtencion = DistribucionUniforme.generar(random, a, b);
-        float finAtencion = relojDia + tiempoAtencion;
+        float finAtencion = relojActual + tiempoAtencion;
 
         this.random3 = random;
         this.tiempoAtencion = tiempoAtencion;
@@ -120,8 +123,8 @@ public class VectorEstado {
      * Calcula y setea los atributos:
      * - relojTotal
      * - horaTotal
-     * - relojDia
-     * - horaDia
+     * - relojActual
+     * - horaActual
      * - dia
      *
      * @param vectorAnterior: vector estado de la fila anterior
@@ -149,7 +152,7 @@ public class VectorEstado {
         if (proximaLlegada != null) {
 
             // Recibir cliente
-            if (proximaLlegada < finAtencionMin && hora <= 8) {
+            if (proximaLlegada < finAtencionMin && proximaLlegada < 480) {
                 proximoReloj = proximaLlegada;
                 proximoEvento = Evento.LLEGADA_CLIENTE;
 
@@ -176,9 +179,10 @@ public class VectorEstado {
 
         // Setear relojes
         this.iteracion++;
-        this.relojDia = proximoReloj;
-        this.relojTotal = Math.max(relojDia - vectorAnterior.getRelojDia(), 0) + vectorAnterior.getRelojTotal();
-        this.hora = (int) Math.ceil(relojDia / 60);
+        this.relojActual = proximoReloj;
+        this.relojTotal = Math.max(relojActual - vectorAnterior.getRelojActual(), 0) + vectorAnterior.getRelojTotal();
+        this.horaActual = (int) Math.ceil(relojActual / 60);
+        this.horaTotal = (int) Math.ceil(relojTotal / 60);
         if (proximoReloj == 0) {
             this.dia = vectorAnterior.getDia() + 1;
         }
@@ -265,7 +269,7 @@ public class VectorEstado {
         for (Peluquero value : peluqueros) {
             peluquero = value;
             Float finAtencion = peluquero.getFinAtencion();
-            if (finAtencion != null && finAtencion == relojDia) {
+            if (finAtencion != null && finAtencion == relojActual) {
                 break;
             }
         }
@@ -322,7 +326,7 @@ public class VectorEstado {
     }
 
     public void actualizarAcumulador(Cliente cliente) {
-        cliente.actualizarAcumulador(relojDia);
+        cliente.actualizarAcumulador(relojActual);
 
         if (cliente.getAcumuladorTiempoEspera() >= 30) {
             this.acumuladorCostos += 1500;

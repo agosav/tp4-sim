@@ -600,7 +600,7 @@ const DataForm = ({setRespuestas}) => {
             )}
           </Col>
         </Row>
-        {porcentajeAprendiz + porcentajeVeteranoA + porcentajeVeteranoB < 100 && (
+        {porcentajeAprendiz + porcentajeVeteranoA + porcentajeVeteranoB !== 100 && (
           <span
             style={{
               color: "red",

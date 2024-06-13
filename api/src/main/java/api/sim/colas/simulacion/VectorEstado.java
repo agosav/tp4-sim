@@ -339,7 +339,7 @@ public class VectorEstado {
 
     // Cortamos la simulación cuando terminó el día n o cuando llegamos a 100 mil iteraciones
     public boolean esLaUltimaFila(int n, int contador) {
-        return proximaLlegada == null && clientes.isEmpty() && dia == n - 1 || contador == 100000;
+        return proximaLlegada == null && clientes.isEmpty() && dia == n || contador == 100000;
     }
 
 }

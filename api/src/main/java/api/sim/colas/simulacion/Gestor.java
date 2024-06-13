@@ -41,7 +41,7 @@ public class Gestor {
         VectorEstado vectorEstado = inicializar(dto);
         List<VectorEstado> tabla = new ArrayList<>();
 
-        int cantidadDias = dto.getCantidadDias() + 1;  // Cantidad de días a simular en total
+        int cantidadDias = dto.getCantidadDias();  // Cantidad de días a simular en total
         int cantidadIteraciones = dto.getCantidadIteraciones();  // Cantidad de iteraciones a mostrar
         int diaDesde = dto.getDiaDesde();
         int horaDesde = dto.getHoraDesde();

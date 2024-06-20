@@ -56,7 +56,7 @@ const GeneralTable = ({ tabla }) => {
 
           <th colSpan="5" style={estilos.oscuro}>Relojes</th>
 
-          <th colSpan="7" style={estilos.claro}>Variables Aleatorias</th>
+          <th colSpan="9" style={estilos.claro}>Variables Aleatorias</th>
 
           <th colSpan="9" style={estilos.oscuro}>Servidores</th>
 
@@ -77,7 +77,7 @@ const GeneralTable = ({ tabla }) => {
 
           <th colSpan="2" style={estilos.oscuro}>Quién atiende</th>
 
-          <th colSpan="2" style={estilos.claro}>Tiempo Atención</th>
+          <th colSpan="4" style={estilos.claro}>Tiempo Atención</th>
 
           <th colSpan="3" style={estilos.peluquero1Info}>APRENDIZ</th>
           <th colSpan="3" style={estilos.peluquero2Info}>VETERANO A</th>
@@ -98,6 +98,8 @@ const GeneralTable = ({ tabla }) => {
           <th rowSpan="2" style={estilos.oscuro}>Nombre</th>
 
           <th rowSpan="2" style={estilos.claro}>Random</th>
+          <th rowSpan="2" style={estilos.claro}>Complejidad</th>
+          <th rowSpan="2" style={estilos.claro}>Runge Kutta</th>
           <th rowSpan="2" style={estilos.claro}>Tiempo Atención</th>
 
           <th style={estilos.peluquero1Info}>Estado</th>
@@ -131,6 +133,8 @@ const GeneralTable = ({ tabla }) => {
             <td style={estilos.oscuro}>{round(fila.random2, 4)}</td>
             <td style={getAttendantStyle(fila.nombreQuienAtiende)}>{fila.nombreQuienAtiende}</td>
             <td style={estilos.claro}>{round(fila.random3, 4)}</td>
+            <td style={estilos.claro}>{round(fila.complejidad, 4)}</td>
+            <td style={estilos.claro}>{round(fila.rungeKutta, 4)}</td>
             <td style={estilos.claro}>{round(fila.tiempoAtencion, 4)}</td>
 
             <td style={estilos.peluquero1Info}>{fila.peluqueros[0].estado}</td>

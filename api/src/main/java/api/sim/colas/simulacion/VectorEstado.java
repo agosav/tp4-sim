@@ -53,14 +53,11 @@ public class VectorEstado {
     private String nombreQuienAtiende;
 
     // Para determinar tiempo de atención si es veterano A
-    private Float random3;
     private Float complejidad;
     private Float rungeKutta;
 
-    // Para determinar tiempo de atención si no es veterano A
-    private Float random4;
-
     // Columna para mostrar el tiempo de atención (independientemente de cómo fue calculado)
+    private Float random3;
     private Float tiempoAtencion;
 
     // Lista con los peluqueros
@@ -118,7 +115,7 @@ public class VectorEstado {
         float tiempoAtencion = DistribucionUniforme.generar(random, a, b);
         float finAtencion = relojActual + tiempoAtencion;
 
-        this.random4 = random;
+        this.random3 = random;
         this.tiempoAtencion = tiempoAtencion;
 
         return finAtencion;

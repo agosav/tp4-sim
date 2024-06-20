@@ -83,7 +83,7 @@ public class RequestDto {
 
     @PositiveOrZero
     @NotNull
-    @JsonProperty("compledjidad_max")
+    @JsonProperty("complejidad_max")
     private float complejidadMax;
 
     @NotNull

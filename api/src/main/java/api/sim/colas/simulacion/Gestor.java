@@ -136,7 +136,7 @@ public class Gestor {
             case INICIALIZACION -> iniciarNuevoDia(vectorProximo);
         }
 
-        vectorProximo.actualizarVariablesEstadisticas();
+        vectorProximo.actualizarVariablesEstadisticas(vectorProximo.getClientes());
 
         return vectorProximo;
     }

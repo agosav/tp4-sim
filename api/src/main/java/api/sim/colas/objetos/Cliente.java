@@ -20,6 +20,9 @@ public class Cliente implements Cloneable {
 
     private Float acumuladorTiempoEspera;
 
+    @Builder.Default
+    private boolean recibioRefresco = false;
+
     private IdPeluqueroDto peluquero;
 
     public void serAtendido(float reloj) {
@@ -34,6 +37,10 @@ public class Cliente implements Cloneable {
 
     public void actualizarAcumulador(float reloj) {
         this.acumuladorTiempoEspera = reloj - tiempoLlegada;
+    }
+
+    public boolean recibioRefresco() {
+        return recibioRefresco;
     }
 
     @Override

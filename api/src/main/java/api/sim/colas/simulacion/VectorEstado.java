@@ -267,21 +267,15 @@ public class VectorEstado {
      * - sillasNecesarias
      * - promedioRecaudacionDiaria
      */
-    public void actualizarVariablesEstadisticas() {
+    public void actualizarVariablesEstadisticas(List<Cliente> clientes) {
         for (Cliente c : clientes) {
-            if (c.getEstado() == EstadoCliente.ESPERANDO_ATENCION) {
+            if (!c.recibioRefresco()) {
                 actualizarAcumulador(c);
-                actualizarCliente(c);
-
-                if (c.getAcumuladorTiempoEspera() >= 30) {
-                    this.acumuladorCostos += 1500;
-                }
             }
         }
 
         // (Máximo valor entre: valor anterior y la suma de clientes actualmente en cola)
         this.sillasNecesarias = Math.max(sillasNecesarias, peluqueros.stream().mapToInt(Peluquero::getCola).sum());
-
         this.promedioRecaudacionDiaria = (acumuladorGanancias - acumuladorCostos) / dia;
     }
 
@@ -356,7 +350,10 @@ public class VectorEstado {
 
         if (cliente.getAcumuladorTiempoEspera() >= 30) {
             this.acumuladorCostos += 1500;
+            cliente.setRecibioRefresco(true);
         }
+
+        actualizarCliente(cliente);
     }
 
     public void cobrarAtencion(Peluquero peluquero) {

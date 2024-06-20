@@ -22,10 +22,10 @@ public class Peluquero implements Cloneable {
 
     private Float finAtencion;
 
-    // Parámetros para la distribución uniforme para el tiempo de atención
-    private float tiempoAtencionMin;  // a
+    // Parámetros para las distribuciones uniformes
+    private Float min;  // a
 
-    private float tiempoAtencionMax;  // b
+    private Float max;  // b
 
     public boolean estaOcupado() {
         return estado == EstadoPeluquero.OCUPADO;

@@ -5,8 +5,10 @@ import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
 import api.sim.colas.utils.DistribucionUniforme;
+import api.sim.colas.utils.RungeKutta;
 import lombok.Builder;
 import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +52,15 @@ public class VectorEstado {
     private Float random2;
     private String nombreQuienAtiende;
 
-    // Para determinar tiempo de atención
+    // Para determinar tiempo de atención si es veterano A
     private Float random3;
+    private Float complejidad;
+    private Float rungeKutta;
+
+    // Para determinar tiempo de atención si no es veterano A
+    private Float random4;
+
+    // Columna para mostrar el tiempo de atención (independientemente de cómo fue calculado)
     private Float tiempoAtencion;
 
     // Lista con los peluqueros
@@ -101,15 +110,35 @@ public class VectorEstado {
         return peluquero;
     }
 
-    public float determinarFinAtencion(Peluquero peluquero) {
+    public float determinarFinAtencionOtrosPeluqueros(Peluquero peluquero) {
         float random = (float) Math.random();
-        float a = peluquero.getTiempoAtencionMin();
-        float b = peluquero.getTiempoAtencionMax();
+        float a = peluquero.getMin();
+        float b = peluquero.getMax();
 
         float tiempoAtencion = DistribucionUniforme.generar(random, a, b);
         float finAtencion = relojActual + tiempoAtencion;
 
+        this.random4 = random;
+        this.tiempoAtencion = tiempoAtencion;
+
+        return finAtencion;
+    }
+
+    public float determinarFinAtencionVeteranoA(Peluquero peluquero, RungeKutta rk) {
+        // Generamos valor aleatorio para la complejidad
+        float random = (float) Math.random();
+        float complejidad = DistribucionUniforme.generar(random, peluquero.getMin(), peluquero.getMax());
+
+        // Buscamos el X correspondiente en la tabla
+        float rungekutta = rk.encontrarX(complejidad);
+
+        // Calculamos el fin de atención
+        float tiempoAtencion = rungekutta * 100;
+        float finAtencion = relojActual + tiempoAtencion;
+
         this.random3 = random;
+        this.complejidad = complejidad;
+        this.rungeKutta = rungekutta;
         this.tiempoAtencion = tiempoAtencion;
 
         return finAtencion;

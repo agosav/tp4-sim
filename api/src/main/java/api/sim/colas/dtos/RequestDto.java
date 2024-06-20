@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ParametrosDto {
+public class RequestDto {
 
     @PositiveOrZero
     @NotNull
@@ -43,11 +43,6 @@ public class ParametrosDto {
 
     @PositiveOrZero
     @NotNull
-    @JsonProperty("tiempo_atencion_min_veterano_a")
-    private float tiempoAtencionMinVeteranoA;
-
-    @PositiveOrZero
-    @NotNull
     @JsonProperty("tiempo_atencion_min_veterano_b")
     private float tiempoAtencionMinVeteranoB;
 
@@ -55,11 +50,6 @@ public class ParametrosDto {
     @NotNull
     @JsonProperty("tiempo_atencion_max_aprendiz")
     private float tiempoAtencionMaxAprendiz;
-
-    @PositiveOrZero
-    @NotNull
-    @JsonProperty("tiempo_atencion_max_veterano_a")
-    private float tiempoAtencionMaxVeteranoA;
 
     @PositiveOrZero
     @NotNull
@@ -85,5 +75,32 @@ public class ParametrosDto {
     @NotNull
     @JsonProperty("dia_desde")
     private int diaDesde;
+
+    @PositiveOrZero
+    @NotNull
+    @JsonProperty("complejidad_min")
+    private float complejidadMin;
+
+    @PositiveOrZero
+    @NotNull
+    @JsonProperty("compledjidad_max")
+    private float complejidadMax;
+
+    @NotNull
+    @JsonProperty("primer_num")
+    private float primerNum;
+
+    @NotNull
+    @JsonProperty("segundo_num")
+    private float segundoNum;
+
+    @NotNull
+    @JsonProperty("tercer_num")
+    private float tercerNum;
+
+    @PositiveOrZero
+    @NotNull
+    @JsonProperty("h")
+    private float h;
 
 }

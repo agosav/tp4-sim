@@ -1,17 +1,20 @@
 package api.sim.colas.simulacion;
 
 import api.sim.colas.dtos.IdPeluqueroDto;
-import api.sim.colas.dtos.ParametrosDto;
+import api.sim.colas.dtos.RequestDto;
 import api.sim.colas.enums.EstadoCliente;
 import api.sim.colas.enums.Evento;
 import api.sim.colas.objetos.Cliente;
 import api.sim.colas.objetos.Peluquero;
 import api.sim.colas.utils.Auxiliar;
 import api.sim.colas.utils.DistribucionUniforme;
+import api.sim.colas.utils.RungeKutta;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Service
 public class Gestor {
 
@@ -27,6 +30,9 @@ public class Gestor {
     // Próxima id de cliente disponible
     private int nextIdCliente;
 
+    // Runge Kutta
+    private RungeKutta rungeKutta;
+
     // ------------------------------------------------------------------------------------
     // ------------ Funciones para la generación y corrida de la simulación ---------------
     // ------------------------------------------------------------------------------------
@@ -37,7 +43,7 @@ public class Gestor {
      * @param dto: Data Transfer Object para recibir todos los parámetros del usuario
      * @return lista con todos los vectores estado que se van a mostrar
      */
-    public List<VectorEstado> realizarSimulacion(ParametrosDto dto) {
+    public List<VectorEstado> realizarSimulacion(RequestDto dto) {
         VectorEstado vectorEstado = inicializar(dto);
         List<VectorEstado> tabla = new ArrayList<>();
 
@@ -68,7 +74,6 @@ public class Gestor {
         }
 
         return tabla;
-
     }
 
     /**
@@ -77,13 +82,28 @@ public class Gestor {
      * @param dto: Data Transfer Object para recibir todos los parámetros del usuario
      * @return primer vector estado de toda la simulación
      */
-    private VectorEstado inicializar(ParametrosDto dto) {
+    private VectorEstado inicializar(RequestDto dto) {
         Auxiliar.validarParametrosDistribuciones(dto);
 
         this.nextIdCliente = 0;
         this.tiempoLlegadaMin = dto.getTiempoLlegadaMin();
         this.tiempoLlegadaMax = dto.getTiempoLlegadaMax();
         this.probabilidadesAtencion = Auxiliar.calcularProbabilidadesAcumuladas(dto);
+
+        // Realizar una sola vez la tabla del runge kutta
+        RungeKutta rk = RungeKutta.builder()
+                .h(dto.getH())
+                .x0(0)
+                .C0(0)
+                .primerNum(dto.getPrimerNum())
+                .segundoNum(dto.getSegundoNum())
+                .tercerNum(dto.getTercerNum())
+                .complejidad(dto.getComplejidadMax())
+                .build();
+
+        rk.realizarTabla();
+
+        this.rungeKutta = rk;
 
         float random = (float) Math.random();
         float tiempoEntreLlegadas = DistribucionUniforme.generar(random, tiempoLlegadaMin, tiempoLlegadaMax);
@@ -162,7 +182,14 @@ public class Gestor {
             - Calculamos el tiempo de fin de atención
          */
         } else {
-            finAtencion = vector.determinarFinAtencion(peluquero);
+            // Determinar tiempo atención para Veterano A
+            if (peluquero.getId() == 1) {
+                finAtencion = vector.determinarFinAtencionVeteranoA(peluquero, rungeKutta);
+
+            // Determianr tiempo atención para Aprendiz o Veterano B
+            } else {
+                finAtencion = vector.determinarFinAtencionOtrosPeluqueros(peluquero);
+            }
             peluquero.atender();
             cliente.serAtendido(vector.getRelojActual());
         }
@@ -192,7 +219,14 @@ public class Gestor {
         Float finAtencion = null;
         if (peluquero.tieneCola()) {
             Cliente siguienteCliente = vector.buscarCliente(peluquero, EstadoCliente.ESPERANDO_ATENCION);
-            finAtencion = vector.determinarFinAtencion(peluquero);
+            // Determinar tiempo atención para Veterano A
+            if (peluquero.getId() == 1) {
+                finAtencion = vector.determinarFinAtencionVeteranoA(peluquero, rungeKutta);
+
+            // Determianr tiempo atención para Aprendiz o Veterano B
+            } else {
+                finAtencion = vector.determinarFinAtencionOtrosPeluqueros(peluquero);
+            }
             siguienteCliente.serAtendido(vector.getRelojActual());
             vector.actualizarAcumulador(siguienteCliente);
             vector.actualizarCliente(siguienteCliente);

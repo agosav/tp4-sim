@@ -1,35 +1,35 @@
 package api.sim.colas.utils;
 
-import api.sim.colas.dtos.ParametrosDto;
+import api.sim.colas.dtos.RequestDto;
 import api.sim.colas.objetos.Peluquero;
 
 import java.util.List;
 
 public class Auxiliar {
 
-    public static List<Peluquero> inicializarPeluqueros(ParametrosDto dto) {
+    public static List<Peluquero> inicializarPeluqueros(RequestDto dto) {
         Peluquero aprendiz = Peluquero.builder()
                 .id(0)
                 .nombre("Aprendiz")
                 .tarifa(1800)
-                .tiempoAtencionMin(dto.getTiempoAtencionMinAprendiz())
-                .tiempoAtencionMax(dto.getTiempoAtencionMaxAprendiz())
+                .min(dto.getTiempoAtencionMinAprendiz())
+                .max(dto.getTiempoAtencionMaxAprendiz())
                 .build();
 
         Peluquero veteranoA = Peluquero.builder()
                 .id(1)
                 .nombre("Veterano A")
                 .tarifa(3500)
-                .tiempoAtencionMin(dto.getTiempoAtencionMinVeteranoA())
-                .tiempoAtencionMax(dto.getTiempoAtencionMaxVeteranoA())
+                .min(dto.getComplejidadMin())
+                .max(dto.getComplejidadMax())
                 .build();
 
         Peluquero veteranoB = Peluquero.builder()
                 .id(2)
                 .nombre("Veterano B")
                 .tarifa(3500)
-                .tiempoAtencionMin(dto.getTiempoAtencionMinVeteranoB())
-                .tiempoAtencionMax(dto.getTiempoAtencionMaxVeteranoB())
+                .min(dto.getTiempoAtencionMinVeteranoB())
+                .max(dto.getTiempoAtencionMaxVeteranoB())
                 .build();
 
         return List.of(aprendiz, veteranoA, veteranoB);
@@ -37,7 +37,7 @@ public class Auxiliar {
 
     // Este método es para acumular las probabilidades en una lista para usar después.
     // [15, 45, 40] -> [0.15, 0.6, 1]
-    public static float[] calcularProbabilidadesAcumuladas(ParametrosDto dto) {
+    public static float[] calcularProbabilidadesAcumuladas(RequestDto dto) {
         float aprendiz = dto.getPorcentajeAprendiz() / 100;
         float veteranoA = dto.getPorcentajeVeteranoA() / 100;
         float veteranoB = dto.getPorcentajeVeteranoB() / 100;
@@ -55,10 +55,10 @@ public class Auxiliar {
         return acumuladas;
     }
 
-    public static void validarParametrosDistribuciones(ParametrosDto dto) {
+    public static void validarParametrosDistribuciones(RequestDto dto) {
         if (DistribucionUniforme.esValido(dto.getTiempoLlegadaMin(), dto.getTiempoLlegadaMax()) ||
+                DistribucionUniforme.esValido(dto.getComplejidadMin(), dto.getComplejidadMax()) ||
                 DistribucionUniforme.esValido(dto.getTiempoAtencionMinAprendiz(), dto.getTiempoAtencionMaxAprendiz()) ||
-                DistribucionUniforme.esValido(dto.getTiempoAtencionMinVeteranoA(), dto.getTiempoAtencionMaxVeteranoA()) ||
                 DistribucionUniforme.esValido(dto.getTiempoAtencionMinVeteranoB(), dto.getTiempoAtencionMaxVeteranoB())) {
             throw new IllegalArgumentException("Los parámetros para las distribuciones son inválidos");
         }

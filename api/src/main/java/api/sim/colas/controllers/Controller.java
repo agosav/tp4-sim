@@ -1,6 +1,6 @@
 package api.sim.colas.controllers;
 
-import api.sim.colas.dtos.ParametrosDto;
+import api.sim.colas.dtos.RequestDto;
 import api.sim.colas.simulacion.Gestor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class Controller {
     private final Gestor gestorSimulacion;
 
     @PostMapping("/simular")
-    public ResponseEntity<?> simular(@Valid @RequestBody ParametrosDto parametros, BindingResult result) {
+    public ResponseEntity<?> simular(@Valid @RequestBody RequestDto parametros, BindingResult result) {
         if (result.hasErrors()) {
             StringBuilder errores = new StringBuilder();
             for (FieldError error : result.getFieldErrors()) {
@@ -35,4 +35,8 @@ public class Controller {
         }
     }
 
+    @GetMapping("/rungekutta")
+    public ResponseEntity<?> getTablaRK() {
+        return ResponseEntity.ok(gestorSimulacion.getRungeKutta().getTabla());
+    }
 }

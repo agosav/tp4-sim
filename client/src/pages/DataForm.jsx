@@ -1,19 +1,22 @@
 /* eslint-disable react/prop-types */
-import React, {useState} from "react";
-import {Button, Col, Form, Row} from "react-bootstrap";
-import {Controller, useForm} from "react-hook-form";
-import {colasServices} from "../services/colas.service";
-import {useNavigate} from "react-router-dom";
+import React, { useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Controller, useForm } from "react-hook-form";
 
-const DataForm = ({setRespuestas}) => {
+import { colasServices } from "../services/colas.service";
+
+import "../styles/styles.css";
+
+const DataForm = ({ setRespuestas }) => {
   const {
     register,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
     reset,
     setValue,
     control,
-    watch
+    watch,
   } = useForm({
     defaultValues: {
       porcentaje_aprendiz: 15.0,
@@ -35,18 +38,26 @@ const DataForm = ({setRespuestas}) => {
       h: 0.01,
       primer_num: 2.0,
       segundo_num: 0.5,
-      tercer_num: 50.0
+      tercer_num: 50.0,
     },
   });
 
   const navigate = useNavigate();
 
-  const tiempoAtencionMinAprendiz = parseFloat(watch("tiempo_atencion_min_aprendiz"));
-  const tiempoAtencionMaxAprendiz = parseFloat(watch("tiempo_atencion_max_aprendiz"));
+  const tiempoAtencionMinAprendiz = parseFloat(
+    watch("tiempo_atencion_min_aprendiz")
+  );
+  const tiempoAtencionMaxAprendiz = parseFloat(
+    watch("tiempo_atencion_max_aprendiz")
+  );
   const complejidadMin = parseFloat(watch("complejidad_min"));
   const complejidadMax = parseFloat(watch("complejidad_max"));
-  const tiempoAtencionMinVeteranoB = parseFloat(watch("tiempo_atencion_min_veterano_b"));
-  const tiempoAtencionMaxVeteranoB = parseFloat(watch("tiempo_atencion_max_veterano_b"));
+  const tiempoAtencionMinVeteranoB = parseFloat(
+    watch("tiempo_atencion_min_veterano_b")
+  );
+  const tiempoAtencionMaxVeteranoB = parseFloat(
+    watch("tiempo_atencion_max_veterano_b")
+  );
   const tiempoLlegadaMin = parseFloat(watch("tiempo_llegada_min"));
   const tiempoLlegadaMax = parseFloat(watch("tiempo_llegada_max"));
   const cantidadDias = parseInt(watch("cantidad_dias"));
@@ -67,7 +78,7 @@ const DataForm = ({setRespuestas}) => {
     );
     data.porcentaje_veterano_a = parseFloat(data.porcentaje_veterano_a);
     data.complejidad_min = parseFloat(data.complejidad_min);
-    data.complejidad_max = parseFloat(data.complejidad_max)
+    data.complejidad_max = parseFloat(data.complejidad_max);
     data.porcentaje_veterano_b = parseFloat(data.porcentaje_veterano_b);
     data.tiempo_atencion_min_veterano_b = parseFloat(
       data.tiempo_atencion_min_veterano_b
@@ -108,7 +119,7 @@ const DataForm = ({setRespuestas}) => {
         <Row className="align-items-start">
           <Col>
             <h4 className="text-center">Aprendiz</h4>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -133,7 +144,7 @@ const DataForm = ({setRespuestas}) => {
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -156,7 +167,7 @@ const DataForm = ({setRespuestas}) => {
               )}
             </Form.Group>
 
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -178,14 +189,14 @@ const DataForm = ({setRespuestas}) => {
                     },
                     max: {
                       value: 480,
-                      message: "Debe ser igual o menor a 480"
+                      message: "Debe ser igual o menor a 480",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -208,7 +219,7 @@ const DataForm = ({setRespuestas}) => {
               )}
             </Form.Group>
 
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -230,14 +241,14 @@ const DataForm = ({setRespuestas}) => {
                     },
                     max: {
                       value: 480,
-                      message: "Debe ser igual o menor a 480"
+                      message: "Debe ser igual o menor a 480",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -267,15 +278,14 @@ const DataForm = ({setRespuestas}) => {
                   fontWeight: "600",
                 }}
               >
-                      {"El mínimo debe ser menor al máximo."}
-                  </span>
+                {"El mínimo debe ser menor al máximo."}
+              </span>
             )}
           </Col>
 
-
           <Col>
             <h4 className="text-center">Veterano A</h4>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -300,7 +310,7 @@ const DataForm = ({setRespuestas}) => {
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -323,7 +333,7 @@ const DataForm = ({setRespuestas}) => {
               )}
             </Form.Group>
 
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -348,7 +358,7 @@ const DataForm = ({setRespuestas}) => {
                       message: "Debe ser igual o mayor a 0",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -371,7 +381,7 @@ const DataForm = ({setRespuestas}) => {
               )}
             </Form.Group>
 
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -396,7 +406,7 @@ const DataForm = ({setRespuestas}) => {
                       message: "Debe ser igual o mayor a 0",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -426,14 +436,14 @@ const DataForm = ({setRespuestas}) => {
                   fontWeight: "600",
                 }}
               >
-                      {"El mínimo debe ser menor al máximo."}
-                  </span>
+                {"El mínimo debe ser menor al máximo."}
+              </span>
             )}
           </Col>
 
           <Col>
             <h4 className="text-center">Veterano B</h4>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -458,7 +468,7 @@ const DataForm = ({setRespuestas}) => {
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -481,7 +491,7 @@ const DataForm = ({setRespuestas}) => {
               )}
             </Form.Group>
 
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -503,14 +513,14 @@ const DataForm = ({setRespuestas}) => {
                     },
                     max: {
                       value: 480,
-                      message: "Debe ser igual o menor a 480"
+                      message: "Debe ser igual o menor a 480",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -533,7 +543,7 @@ const DataForm = ({setRespuestas}) => {
               )}
             </Form.Group>
 
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -555,14 +565,14 @@ const DataForm = ({setRespuestas}) => {
                     },
                     max: {
                       value: 480,
-                      message: "Debe ser igual o menor a 480"
+                      message: "Debe ser igual o menor a 480",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -592,27 +602,28 @@ const DataForm = ({setRespuestas}) => {
                   fontWeight: "600",
                 }}
               >
-                      {"El mínimo debe ser menor al máximo."}
-                  </span>
+                {"El mínimo debe ser menor al máximo."}
+              </span>
             )}
           </Col>
         </Row>
-        {porcentajeAprendiz + porcentajeVeteranoA + porcentajeVeteranoB !== 100 && (
+        {porcentajeAprendiz + porcentajeVeteranoA + porcentajeVeteranoB !==
+          100 && (
           <span
             style={{
               color: "red",
               fontWeight: "600",
             }}
           >
-                      {"La suma de las probabilidades no da 100%."}
-                  </span>
+            {"La suma de las probabilidades no da 100%."}
+          </span>
         )}
 
-        <hr/>
+        <hr />
         <h3>Clientes</h3>
         <Row className="align-items-start">
           <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -634,14 +645,14 @@ const DataForm = ({setRespuestas}) => {
                     },
                     max: {
                       value: 480,
-                      message: "Debe ser igual o menor a 480"
+                      message: "Debe ser igual o menor a 480",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -665,7 +676,7 @@ const DataForm = ({setRespuestas}) => {
             </Form.Group>
           </Col>
           <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -687,14 +698,14 @@ const DataForm = ({setRespuestas}) => {
                     },
                     max: {
                       value: 480,
-                      message: "Debe ser igual o menor a 480"
+                      message: "Debe ser igual o menor a 480",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -725,16 +736,16 @@ const DataForm = ({setRespuestas}) => {
                 fontWeight: "600",
               }}
             >
-                      {"El mínimo debe ser menor al máximo."}
-                  </span>
+              {"El mínimo debe ser menor al máximo."}
+            </span>
           )}
         </Row>
 
-        <hr/>
+        <hr />
         <h3>Simulación</h3>
         <Row className="align-items-start">
           <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -752,7 +763,7 @@ const DataForm = ({setRespuestas}) => {
                   rules={{
                     min: {
                       value: 1,
-                      message: "El valor mínimo es 1"
+                      message: "El valor mínimo es 1",
                     },
                     pattern: {
                       value: /^[0-9]+$/,
@@ -763,8 +774,12 @@ const DataForm = ({setRespuestas}) => {
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
-                    <Form.Control type="number" {...field} placeholder="Ejemplo: 1000"/>
+                  render={({ field }) => (
+                    <Form.Control
+                      type="number"
+                      {...field}
+                      placeholder="Ejemplo: 1000"
+                    />
                   )}
                 />
               </div>
@@ -783,7 +798,7 @@ const DataForm = ({setRespuestas}) => {
           </Col>
 
           <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -801,7 +816,7 @@ const DataForm = ({setRespuestas}) => {
                   rules={{
                     min: {
                       value: 1,
-                      message: "El valor mínimo es 1"
+                      message: "El valor mínimo es 1",
                     },
                     max: {
                       value: 8,
@@ -816,8 +831,12 @@ const DataForm = ({setRespuestas}) => {
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
-                    <Form.Control type="number" {...field} placeholder="Ejemplo: 1"/>
+                  render={({ field }) => (
+                    <Form.Control
+                      type="number"
+                      {...field}
+                      placeholder="Ejemplo: 1"
+                    />
                   )}
                 />
               </div>
@@ -836,7 +855,7 @@ const DataForm = ({setRespuestas}) => {
           </Col>
 
           <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -858,15 +877,19 @@ const DataForm = ({setRespuestas}) => {
                     },
                     min: {
                       value: 1,
-                      message: "El valor mínimo es 1"
+                      message: "El valor mínimo es 1",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
-                    <Form.Control type="number" {...field} placeholder="Ejemplo: 1"/>
+                  render={({ field }) => (
+                    <Form.Control
+                      type="number"
+                      {...field}
+                      placeholder="Ejemplo: 1"
+                    />
                   )}
                 />
               </div>
@@ -890,13 +913,13 @@ const DataForm = ({setRespuestas}) => {
                   fontWeight: "600",
                 }}
               >
-                      {"El valor máximo es " + cantidadDias}
-                  </span>
+                {"El valor máximo es " + cantidadDias}
+              </span>
             )}
           </Col>
 
           <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -922,15 +945,19 @@ const DataForm = ({setRespuestas}) => {
                     },
                     min: {
                       value: 0,
-                      message: "El valor mínimo es 0"
+                      message: "El valor mínimo es 0",
                     },
                     required: {
                       value: true,
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
-                    <Form.Control type="number" {...field} placeholder="Ejemplo: 100"/>
+                  render={({ field }) => (
+                    <Form.Control
+                      type="number"
+                      {...field}
+                      placeholder="Ejemplo: 100"
+                    />
                   )}
                 />
               </div>
@@ -948,7 +975,7 @@ const DataForm = ({setRespuestas}) => {
             </Form.Group>
           </Col>
           <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
+            <Form.Group controlId="1" style={{ margin: "8px" }}>
               <div className="d-flex align-items-center">
                 <Form.Label
                   className="mr-2"
@@ -973,7 +1000,7 @@ const DataForm = ({setRespuestas}) => {
                       message: "Este campo es requerido",
                     },
                   }}
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Form.Control
                       type="number"
                       {...field}
@@ -996,146 +1023,158 @@ const DataForm = ({setRespuestas}) => {
               )}
             </Form.Group>
           </Col>
-          <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
-              <div className="d-flex align-items-center">
-                <Form.Label
-                  className="mr-2"
-                  style={{
-                    marginRight: "12px",
-                    width: "300px",
-                    marginBottom: "0",
-                  }}
-                >
-                  Primer número
-                </Form.Label>
-                <Controller
-                  name="primer_num"
-                  control={control}
-                  rules={{
-                    required: {
-                      value: true,
-                      message: "Este campo es requerido",
-                    },
-                  }}
-                  render={({field}) => (
-                    <Form.Control
-                      type="number"
-                      {...field}
-                      placeholder="Ingrese un número"
-                      step="0.1"
-                    />
-                  )}
-                />
-              </div>
-              {errors.primer_num && (
-                <span
-                  style={{
-                    marginLeft: "140px",
-                    color: "red",
-                    fontWeight: "600",
-                  }}
-                >
-                  {errors.primer_num.message}
-                </span>
-              )}
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
-              <div className="d-flex align-items-center">
-                <Form.Label
-                  className="mr-2"
-                  style={{
-                    marginRight: "12px",
-                    width: "300px",
-                    marginBottom: "0",
-                  }}
-                >
-                  Segundo número
-                </Form.Label>
-                <Controller
-                  name="segundo_num"
-                  control={control}
-                  rules={{
-                    required: {
-                      value: true,
-                      message: "Este campo es requerido",
-                    },
-                  }}
-                  render={({field}) => (
-                    <Form.Control
-                      type="number"
-                      {...field}
-                      placeholder="Ingrese un número"
-                      step="0.1"
-                    />
-                  )}
-                />
-              </div>
-              {errors.segundo_num && (
-                <span
-                  style={{
-                    marginLeft: "140px",
-                    color: "red",
-                    fontWeight: "600",
-                  }}
-                >
-                  {errors.segundo_num.message}
-                </span>
-              )}
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="1" style={{margin: "8px"}}>
-              <div className="d-flex align-items-center">
-                <Form.Label
-                  className="mr-2"
-                  style={{
-                    marginRight: "12px",
-                    width: "300px",
-                    marginBottom: "0",
-                  }}
-                >
-                  Tercer número
-                </Form.Label>
-                <Controller
-                  name="tercer_num"
-                  control={control}
-                  rules={{
-                    required: {
-                      value: true,
-                      message: "Este campo es requerido",
-                    },
-                  }}
-                  render={({field}) => (
-                    <Form.Control
-                      type="number"
-                      {...field}
-                      placeholder="Ingrese un número"
-                      step="0.1"
-                    />
-                  )}
-                />
-              </div>
-              {errors.tercer_num && (
-                <span
-                  style={{
-                    marginLeft: "140px",
-                    color: "red",
-                    fontWeight: "600",
-                  }}
-                >
-                  {errors.tercer_num.message}
-                </span>
-              )}
-            </Form.Group>
-          </Col>
         </Row>
 
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Form.Group controlId="1" style={{ margin: "8px" }}>
+            <div className="d-flex align-items-center">
+              <Controller
+                name="primer_num"
+                control={control}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Este campo es requerido",
+                  },
+                }}
+                render={({ field }) => (
+                  <Form.Control
+                    type="number"
+                    {...field}
+                    placeholder="Ingrese un número"
+                    step="0.1"
+                    style={{
+                      width: "200px",
+                      height: "50px",
+                      border: "2px solid  rgba(0, 0, 0, 0.1)",
+                      margin: "0 5px",
+                      textAlign: "center",
+                      boxShadow: "3px 3px 5px rgba(0, 0, 0, 0.1)",
+                      borderRadius: "4px",
+                    }}
+                  />
+                )}
+              />
+            </div>
+            {errors.primer_num && (
+              <span
+                style={{
+                  marginLeft: "140px",
+                  color: "red",
+                  fontWeight: "600",
+                }}
+              >
+                {errors.primer_num.message}
+              </span>
+            )}
+          </Form.Group>
+
+          <span className="operator">(</span>
+          <span className="operator">c + </span>
+
+          <Form.Group controlId="1" style={{ margin: "8px" }}>
+            <div className="d-flex align-items-center">
+              <Controller
+                name="segundo_num"
+                control={control}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Este campo es requerido",
+                  },
+                }}
+                render={({ field }) => (
+                  <Form.Control
+                    type="number"
+                    {...field}
+                    placeholder="Ingrese un número"
+                    step="0.1"
+                    style={{
+                      width: "200px",
+                      height: "50px",
+                      border: "2px solid  rgba(0, 0, 0, 0.1)",
+                      margin: "0 5px",
+                      textAlign: "center",
+                      boxShadow: "3px 3px 5px rgba(0, 0, 0, 0.1)",
+                      borderRadius: "4px",
+                    }}
+                  />
+                )}
+              />
+            </div>
+            {errors.segundo_num && (
+              <span
+                style={{
+                  marginLeft: "140px",
+                  color: "red",
+                  fontWeight: "600",
+                }}
+              >
+                {errors.segundo_num.message}
+              </span>
+            )}
+          </Form.Group>
+
+          <span className="operator">)</span>
+          <span className="exponent">2</span>
+          <span className="operator"> + </span>
+
+          <Form.Group controlId="1" style={{ margin: "8px" }}>
+            <div className="d-flex align-items-center">
+              <Controller
+                name="tercer_num"
+                control={control}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Este campo es requerido",
+                  },
+                }}
+                render={({ field }) => (
+                  <Form.Control
+                    type="number"
+                    {...field}
+                    placeholder="Ingrese un número"
+                    step="0.1"
+                    style={{
+                      width: "200px",
+                      height: "50px",
+                      border: "2px solid  rgba(0, 0, 0, 0.1)",
+                      margin: "0 5px",
+                      textAlign: "center",
+                      boxShadow: "3px 3px 5px rgba(0, 0, 0, 0.1)",
+                      borderRadius: "4px",
+                    }}
+                  />
+                )}
+              />
+            </div>
+            {errors.tercer_num && (
+              <span
+                style={{
+                  marginLeft: "140px",
+                  color: "red",
+                  fontWeight: "600",
+                }}
+              >
+                {errors.tercer_num.message}
+              </span>
+            )}
+          </Form.Group>
+        </div>
+
         <div className="align-itms-end">
-          <Button className="btn btn-primary" onClick={handleSubmit(onSubmit)}
-                  style={{"margin-top": "10px"}}>
+          <Button
+            className="btn btn-primary"
+            onClick={handleSubmit(onSubmit)}
+            style={{ "margin-top": "10px" }}
+          >
             Calcular
           </Button>
         </div>
@@ -1144,4 +1183,4 @@ const DataForm = ({setRespuestas}) => {
   );
 };
 
-export {DataForm};
+export { DataForm };

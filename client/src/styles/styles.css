@@ -2,3 +2,13 @@
     white-space: nowrap;
     width: auto;
 }
+
+.operator,
+.exponent {
+    font-size: 1.5rem;
+}
+
+.exponent {
+    vertical-align: super;
+    margin-bottom: 20px;
+}

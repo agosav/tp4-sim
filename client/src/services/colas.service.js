@@ -9,8 +9,18 @@ const simular = async (data) => {
     }
 }
 
+const getRK = async () => {
+    try {
+        const response = await axios.get('http://localhost:8080/colas/rungekutta');
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
 const colasServices = {
-    simular
+    simular,
+    getRK
 }
 
 export { colasServices }

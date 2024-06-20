@@ -21,7 +21,7 @@ public class Cliente implements Cloneable {
     private Float acumuladorTiempoEspera;
 
     @Builder.Default
-    private boolean recibioRefresco = false;
+    private boolean puedeRecibirRefresco = true;
 
     private IdPeluqueroDto peluquero;
 
@@ -29,6 +29,7 @@ public class Cliente implements Cloneable {
         this.estado = EstadoCliente.SIENDO_ATENDIDO;
         this.tiempoAtencion = reloj;
         this.acumuladorTiempoEspera = Math.max(reloj - tiempoLlegada, 0);
+        this.puedeRecibirRefresco = false;
     }
 
     public void esperar() {
@@ -36,11 +37,13 @@ public class Cliente implements Cloneable {
     }
 
     public void actualizarAcumulador(float reloj) {
-        this.acumuladorTiempoEspera = reloj - tiempoLlegada;
+        if (puedeRecibirRefresco) {
+            this.acumuladorTiempoEspera = reloj - tiempoLlegada;
+        }
     }
 
-    public boolean recibioRefresco() {
-        return recibioRefresco;
+    public boolean puedeRecibirRefresco() {
+        return puedeRecibirRefresco;
     }
 
     @Override

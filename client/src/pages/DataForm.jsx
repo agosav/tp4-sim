@@ -1050,7 +1050,7 @@ const DataForm = ({ setRespuestas }) => {
                     placeholder="Ingrese un número"
                     step="0.1"
                     style={{
-                      width: "200px",
+                      width: "70px",
                       height: "50px",
                       border: "2px solid  rgba(0, 0, 0, 0.1)",
                       margin: "0 5px",
@@ -1096,7 +1096,7 @@ const DataForm = ({ setRespuestas }) => {
                     placeholder="Ingrese un número"
                     step="0.1"
                     style={{
-                      width: "200px",
+                      width: "70px",
                       height: "50px",
                       border: "2px solid  rgba(0, 0, 0, 0.1)",
                       margin: "0 5px",
@@ -1143,7 +1143,7 @@ const DataForm = ({ setRespuestas }) => {
                     placeholder="Ingrese un número"
                     step="0.1"
                     style={{
-                      width: "200px",
+                      width: "70px",
                       height: "50px",
                       border: "2px solid  rgba(0, 0, 0, 0.1)",
                       margin: "0 5px",

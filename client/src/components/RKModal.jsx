@@ -17,6 +17,12 @@ export default function RKModal({ show, handleClose }) {
     console.log("RK: ", rk);
   }, [rk]);
 
+  const round = (num, decimales) => {
+    if (num === null) return null;
+    if (num === 0) return 0;
+    return parseFloat(num).toFixed(decimales);
+  };
+
   return (
     <Modal show={show} onHide={handleClose} size="xl">
       <Modal.Header closeButton>
@@ -41,7 +47,7 @@ export default function RKModal({ show, handleClose }) {
               {rk.map((row, index) => (
                 <tr key={index}>
                   {row.map((value, subIndex) => (
-                    <td key={subIndex}>{value}</td>
+                    <td key={subIndex}>{round(value, 4)}</td>
                   ))}
                 </tr>
               ))}

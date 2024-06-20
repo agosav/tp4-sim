@@ -269,9 +269,7 @@ public class VectorEstado {
      */
     public void actualizarVariablesEstadisticas(List<Cliente> clientes) {
         for (Cliente c : clientes) {
-            if (!c.recibioRefresco()) {
-                actualizarAcumulador(c);
-            }
+            actualizarAcumulador(c);
         }
 
         // (Máximo valor entre: valor anterior y la suma de clientes actualmente en cola)
@@ -348,9 +346,9 @@ public class VectorEstado {
     public void actualizarAcumulador(Cliente cliente) {
         cliente.actualizarAcumulador(relojActual);
 
-        if (cliente.getAcumuladorTiempoEspera() >= 30) {
+        if (cliente.getAcumuladorTiempoEspera() >= 30 && cliente.puedeRecibirRefresco()) {
             this.acumuladorCostos += 1500;
-            cliente.setRecibioRefresco(true);
+            cliente.setPuedeRecibirRefresco(false);
         }
 
         actualizarCliente(cliente);
